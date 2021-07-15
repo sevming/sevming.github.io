@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="php," />
+
+
+<meta name="description" content="三级联动SQL(包含港澳台), 密码：k6l9港澳台JSON数据1&amp;#123;&quot;taiwan&quot;:&amp;#123;&quot;province&quot;:&quot;台湾&quot;,&quot;provinceID&quot;:&quot;710000&quot;,&quot;citys&quot;:[&amp;#123;&quot;areas&quot;:[&amp;#123;&quot;area&quot;:&quot;阿莲区&quot;,&quot;areaID&quot;:&quot;&quot;&amp;#125;,&amp;#123;&quot;area&quot;:&quot;大寮区&quot;,&quot;areaID&quot;:&quot;&quot;&amp;#125;,&amp;#123;&quot;are">
+<meta name="keywords" content="php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="全国省市区乡村五级联动">
+<meta property="og:url" content="http://sevming.github.io/PHP/linkage.html">
+<meta property="og:site_name" content="Mr.Blog">
+<meta property="og:description" content="三级联动SQL(包含港澳台), 密码：k6l9港澳台JSON数据1&amp;#123;&quot;taiwan&quot;:&amp;#123;&quot;province&quot;:&quot;台湾&quot;,&quot;provinceID&quot;:&quot;710000&quot;,&quot;citys&quot;:[&amp;#123;&quot;areas&quot;:[&amp;#123;&quot;area&quot;:&quot;阿莲区&quot;,&quot;areaID&quot;:&quot;&quot;&amp;#125;,&amp;#123;&quot;area&quot;:&quot;大寮区&quot;,&quot;areaID&quot;:&quot;&quot;&amp;#125;,&amp;#123;&quot;are">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-07-15T04:00:35.448Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="全国省市区乡村五级联动">
+<meta name="twitter:description" content="三级联动SQL(包含港澳台), 密码：k6l9港澳台JSON数据1&amp;#123;&quot;taiwan&quot;:&amp;#123;&quot;province&quot;:&quot;台湾&quot;,&quot;provinceID&quot;:&quot;710000&quot;,&quot;citys&quot;:[&amp;#123;&quot;areas&quot;:[&amp;#123;&quot;area&quot;:&quot;阿莲区&quot;,&quot;areaID&quot;:&quot;&quot;&amp;#125;,&amp;#123;&quot;area&quot;:&quot;大寮区&quot;,&quot;areaID&quot;:&quot;&quot;&amp;#125;,&amp;#123;&quot;are">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Mr.Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://sevming.github.io/PHP/linkage.html"/>
+
+
+  <title>全国省市区乡村五级联动 | Mr.Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr.Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+  
+  
+  
+    <a href="https://github.com/sevming" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sevming.github.io/PHP/linkage.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mr">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr.Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">全国省市区乡村五级联动</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-10T22:55:57+00:00">2018-10-10</time>
+            
+
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/PHP/" itemprop="url" rel="index"><span itemprop="name">PHP</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h5 id="三级联动SQL-包含港澳台-密码：k6l9"><a href="#三级联动SQL-包含港澳台-密码：k6l9" class="headerlink" title="三级联动SQL(包含港澳台), 密码：k6l9"></a><a href="https://pan.baidu.com/s/1TZbxrDd24Sq-CEE_TWAvgQ" target="_blank" rel="noopener">三级联动SQL(包含港澳台), 密码：k6l9</a></h5><h5 id="港澳台JSON数据"><a href="#港澳台JSON数据" class="headerlink" title="港澳台JSON数据"></a>港澳台JSON数据</h5><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">"taiwan"</span>:&#123;<span class="string">"province"</span>:<span class="string">"台湾"</span>,<span class="string">"provinceID"</span>:<span class="string">"710000"</span>,<span class="string">"citys"</span>:[&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"阿莲区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大寮区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大社区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大树区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"凤山区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"冈山区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"鼓山区"</span>,<span class="string">"areaID"</span>:<span class="string">"710205"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"湖内区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"甲仙区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"林园区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"芩雅区"</span>,<span class="string">"areaID"</span>:<span class="string">"710203"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"六龟区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"路竹区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"茂林区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"美浓区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"弥陀区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"楠梓区"</span>,<span class="string">"areaID"</span>:<span class="string">"710210"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"那玛厦区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"内门区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"鸟松区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"旗津区"</span>,<span class="string">"areaID"</span>:<span class="string">"710206"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"旗山区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"其它区"</span>,<span class="string">"areaID"</span>:<span class="string">"710212"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"前金区"</span>,<span class="string">"areaID"</span>:<span class="string">"710202"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"前镇区"</span>,<span class="string">"areaID"</span>:<span class="string">"710207"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"桥头区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"茄萣区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"仁武区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"三民区"</span>,<span class="string">"areaID"</span>:<span class="string">"710208"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"杉林区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"桃源区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"田寮区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"小港区"</span>,<span class="string">"areaID"</span>:<span class="string">"710211"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新兴区"</span>,<span class="string">"areaID"</span>:<span class="string">"710201"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"燕巢区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"盐埕区"</span>,<span class="string">"areaID"</span>:<span class="string">"710204"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"永安区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"梓官区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"左营区"</span>,<span class="string">"areaID"</span>:<span class="string">"710209"</span>&#125;],<span class="string">"city"</span>:<span class="string">"高雄市"</span>,<span class="string">"cityID"</span>:<span class="string">"710200"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"丰滨乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"凤林镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"富里乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"光复乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"花莲市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"吉安乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"瑞穗乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"寿丰乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"太鲁阁"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"万荣乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新城乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"秀林乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"玉里镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"卓溪乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"花莲县"</span>,<span class="string">"cityID"</span>:<span class="string">"712600"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"安乐区"</span>,<span class="string">"areaID"</span>:<span class="string">"710705"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"暖暖区"</span>,<span class="string">"areaID"</span>:<span class="string">"710706"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"七堵区"</span>,<span class="string">"areaID"</span>:<span class="string">"710707"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"其它区"</span>,<span class="string">"areaID"</span>:<span class="string">"710708"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"仁爱区"</span>,<span class="string">"areaID"</span>:<span class="string">"710701"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"信义区"</span>,<span class="string">"areaID"</span>:<span class="string">"710702"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"中山区"</span>,<span class="string">"areaID"</span>:<span class="string">"710704"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"中正区"</span>,<span class="string">"areaID"</span>:<span class="string">"710703"</span>&#125;],<span class="string">"city"</span>:<span class="string">"基隆市"</span>,<span class="string">"cityID"</span>:<span class="string">"710700"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"东区"</span>,<span class="string">"areaID"</span>:<span class="string">"710901"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"其它区"</span>,<span class="string">"areaID"</span>:<span class="string">"710903"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"西区"</span>,<span class="string">"areaID"</span>:<span class="string">"710902"</span>&#125;],<span class="string">"city"</span>:<span class="string">"嘉义市"</span>,<span class="string">"cityID"</span>:<span class="string">"710900"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"阿里山乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"布袋镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大林镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大埔乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"东石乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"番路乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"六脚乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"鹿草乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"梅山乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"民雄乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"朴子乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"水上乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"太保市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"溪口乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新港乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"义竹乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"中埔乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"竹崎乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"嘉义县"</span>,<span class="string">"cityID"</span>:<span class="string">"711900"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"金城镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"金湖镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"金宁乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"金沙镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"烈屿乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"乌坵乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"金门县"</span>,<span class="string">"cityID"</span>:<span class="string">"710500"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"北竿乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"东引乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"莒光乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"南竿乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"连江县"</span>,<span class="string">"cityID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"大湖乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"公馆乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"后龙镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"苗栗市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"南庄乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"三湾乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"三义乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"狮潭乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"泰安乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"铜锣乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"通霄镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"头份镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"头屋乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"西湖乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"苑里镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"造桥乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"竹南镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"卓兰镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"苗栗县"</span>,<span class="string">"cityID"</span>:<span class="string">"711500"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"草屯镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"国姓乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"集集镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"鹿谷乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"名间乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"南投市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"埔里镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"仁爱乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"水里乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"信义乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"鱼池乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"中寮乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"竹山镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"南投县"</span>,<span class="string">"cityID"</span>:<span class="string">"710600"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"白沙乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"湖西乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"马公市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"七美乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"望安乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"西屿乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"澎湖县"</span>,<span class="string">"cityID"</span>:<span class="string">"712700"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"长治乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"潮州镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"车城乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"春日乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"东港镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"枋寮乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"枋山乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"高树乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"桓春镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"佳冬乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"九如乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"崁顶乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"来义乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"里港乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"林边乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"麟洛乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"琉球乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"玛家乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"满州乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"牡丹乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"南州乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"内埔乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"屏东市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"三地门乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"狮子乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"泰武乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"万丹乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"万峦乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"雾台乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新埤乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新园乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"盐埔乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"竹田乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"屏东县"</span>,<span class="string">"cityID"</span>:<span class="string">"712400"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"北投区"</span>,<span class="string">"areaID"</span>:<span class="string">"710109"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大安区"</span>,<span class="string">"areaID"</span>:<span class="string">"710105"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大同区"</span>,<span class="string">"areaID"</span>:<span class="string">"710102"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"南港区"</span>,<span class="string">"areaID"</span>:<span class="string">"710111"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"内湖区"</span>,<span class="string">"areaID"</span>:<span class="string">"710110"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"其它区"</span>,<span class="string">"areaID"</span>:<span class="string">"710113"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"士林区"</span>,<span class="string">"areaID"</span>:<span class="string">"710108"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"松山区"</span>,<span class="string">"areaID"</span>:<span class="string">"710104"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"万华区"</span>,<span class="string">"areaID"</span>:<span class="string">"710106"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"文山区"</span>,<span class="string">"areaID"</span>:<span class="string">"710112"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"信义区"</span>,<span class="string">"areaID"</span>:<span class="string">"710107"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"中山区"</span>,<span class="string">"areaID"</span>:<span class="string">"710103"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"中正区"</span>,<span class="string">"areaID"</span>:<span class="string">"710101"</span>&#125;],<span class="string">"city"</span>:<span class="string">"台北市"</span>,<span class="string">"cityID"</span>:<span class="string">"710100"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"卑南乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"长滨乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"成功镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"池上乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"达仁乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大武乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"东河乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"关山镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"海瑞乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"金峰乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"兰屿乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"鹿野乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"绿岛乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"台东市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"太麻里乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"延平乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"台东县"</span>,<span class="string">"cityID"</span>:<span class="string">"712500"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"安定区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"安南区"</span>,<span class="string">"areaID"</span>:<span class="string">"710306"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"安平区"</span>,<span class="string">"areaID"</span>:<span class="string">"710305"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"白河区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"北门区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"北区"</span>,<span class="string">"areaID"</span>:<span class="string">"710304"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大内区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"东区"</span>,<span class="string">"areaID"</span>:<span class="string">"710302"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"东山区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"关庙区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"官田区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"归仁区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"后壁区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"佳里区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"将军区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"六甲区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"柳营区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"龙崎区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"麻豆区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"南化区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"南区"</span>,<span class="string">"areaID"</span>:<span class="string">"710303"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"楠西区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"七股区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"其它区"</span>,<span class="string">"areaID"</span>:<span class="string">"710307"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"仁德区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"善化区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"山上区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"西港区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"下营区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新化区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新市区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新营区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"学甲区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"盐水区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"永康区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"玉井区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"中西区"</span>,<span class="string">"areaID"</span>:<span class="string">"710301"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"左镇区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"台南市"</span>,<span class="string">"cityID"</span>:<span class="string">"710300"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"北区"</span>,<span class="string">"areaID"</span>:<span class="string">"710405"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"北屯区"</span>,<span class="string">"areaID"</span>:<span class="string">"710406"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大安区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大肚区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大甲区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大里区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大雅区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"东区"</span>,<span class="string">"areaID"</span>:<span class="string">"710402"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"东势区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"丰原区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"和平区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"后里区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"龙井区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"南区"</span>,<span class="string">"areaID"</span>:<span class="string">"710403"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"南屯区"</span>,<span class="string">"areaID"</span>:<span class="string">"710408"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"其它区"</span>,<span class="string">"areaID"</span>:<span class="string">"710409"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"清水区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"沙鹿区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"神冈区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"石冈区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"太平区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"潭子区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"外埔区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"雾峰区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"梧栖区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"乌日区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"西区"</span>,<span class="string">"areaID"</span>:<span class="string">"710404"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"西屯区"</span>,<span class="string">"areaID"</span>:<span class="string">"710407"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新社区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"中区"</span>,<span class="string">"areaID"</span>:<span class="string">"710401"</span>&#125;],<span class="string">"city"</span>:<span class="string">"台中市"</span>,<span class="string">"cityID"</span>:<span class="string">"710400"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"八德市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大溪镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大园乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"复兴乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"观音乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"龟山乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"龙潭乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"芦竹乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"平镇市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"桃园市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新屋乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"杨梅市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"中坜市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"桃园县"</span>,<span class="string">"cityID"</span>:<span class="string">"711400"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"八里区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"板桥区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"淡水区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"贡寮区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"金山区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"林口区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"芦洲区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"坪林区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"平溪区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"瑞芳区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"三峡区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"三芝区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"三重区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"深坑区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"石碇区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"石门区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"树林区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"双溪区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"泰山区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"土城区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"万里区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"五股区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"乌来区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"汐止区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新店区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新庄区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"莺歌区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"永和区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"中和区"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"新北市"</span>,<span class="string">"cityID"</span>:<span class="string">"711100"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"北区"</span>,<span class="string">"areaID"</span>:<span class="string">"710802"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"东区"</span>,<span class="string">"areaID"</span>:<span class="string">"710801"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"其它区"</span>,<span class="string">"areaID"</span>:<span class="string">"710804"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"香山区"</span>,<span class="string">"areaID"</span>:<span class="string">"710803"</span>&#125;],<span class="string">"city"</span>:<span class="string">"新竹市"</span>,<span class="string">"cityID"</span>:<span class="string">"710800"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"宝山乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"北埔乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"峨眉乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"关西镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"横山乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"湖口乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"尖石乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"五峰乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新丰乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"新埔镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"芎林乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"竹北市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"竹东镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"新竹县"</span>,<span class="string">"cityID"</span>:<span class="string">"711300"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"大同乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"钓鱼台"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"冬山乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"礁溪乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"罗东镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"南澳乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"三星乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"苏澳镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"头城镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"五结乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"宜兰市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"员山乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"壮围乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"宜兰县"</span>,<span class="string">"cityID"</span>:<span class="string">"711200"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"褒忠乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"北港镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"莿桐乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大埤乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"东势乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"斗六乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"斗南镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"二仑乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"古坑乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"虎尾镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"口湖乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"林内乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"仑背乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"麦寮乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"水林乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"四湖乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"台西乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"土库镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"西螺镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"元长乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"云林县"</span>,<span class="string">"cityID"</span>:<span class="string">"712100"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"北斗镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大城乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大村乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"二林镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"二水乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"芳苑乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"芬园乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"福兴乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"和美镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"花坛乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"鹿港镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"埤头乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"埔心乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"埔盐乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"社头乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"伸港乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"田尾乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"田中镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"溪湖镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"溪州乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"线西乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"秀水乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"永靖乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"员林镇"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"彰化市"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"竹塘乡"</span>,<span class="string">"areaID"</span>:<span class="string">""</span>&#125;],<span class="string">"city"</span>:<span class="string">"彰化县"</span>,<span class="string">"cityID"</span>:<span class="string">"711700"</span>&#125;]&#125;,<span class="string">"hk"</span>:&#123;<span class="string">"province"</span>:<span class="string">"香港"</span>,<span class="string">"provinceID"</span>:<span class="string">"810000"</span>,<span class="string">"citys"</span>:[&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"九龙城区"</span>,<span class="string">"areaID"</span>:<span class="string">"810201"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"油尖旺区"</span>,<span class="string">"areaID"</span>:<span class="string">"810202"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"深水埗区"</span>,<span class="string">"areaID"</span>:<span class="string">"810203"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"黄大仙区"</span>,<span class="string">"areaID"</span>:<span class="string">"810204"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"观塘区"</span>,<span class="string">"areaID"</span>:<span class="string">"810205"</span>&#125;],<span class="string">"city"</span>:<span class="string">"九龙"</span>,<span class="string">"cityID"</span>:<span class="string">"810200"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"中西区"</span>,<span class="string">"areaID"</span>:<span class="string">"810101"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"湾仔"</span>,<span class="string">"areaID"</span>:<span class="string">"810102"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"东区"</span>,<span class="string">"areaID"</span>:<span class="string">"810103"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"南区"</span>,<span class="string">"areaID"</span>:<span class="string">"810104"</span>&#125;],<span class="string">"city"</span>:<span class="string">"香港岛"</span>,<span class="string">"cityID"</span>:<span class="string">"810100"</span>&#125;,&#123;<span class="string">"areas"</span>:[&#123;<span class="string">"area"</span>:<span class="string">"北区"</span>,<span class="string">"areaID"</span>:<span class="string">"810301"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"大埔区"</span>,<span class="string">"areaID"</span>:<span class="string">"810302"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"沙田区"</span>,<span class="string">"areaID"</span>:<span class="string">"810303"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"西贡区"</span>,<span class="string">"areaID"</span>:<span class="string">"810304"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"元朗区"</span>,<span class="string">"areaID"</span>:<span class="string">"810305"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"屯门区"</span>,<span class="string">"areaID"</span>:<span class="string">"810306"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"荃湾区"</span>,<span class="string">"areaID"</span>:<span class="string">"810307"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"葵青区"</span>,<span class="string">"areaID"</span>:<span class="string">"810308"</span>&#125;,&#123;<span class="string">"area"</span>:<span class="string">"离岛区"</span>,<span class="string">"areaID"</span>:<span class="string">"810309"</span>&#125;],<span class="string">"city"</span>:<span class="string">"新界"</span>,<span class="string">"cityID"</span>:<span class="string">"810300"</span>&#125;]&#125;,<span class="string">"mo"</span>:&#123;<span class="string">"province"</span>:<span class="string">"澳门"</span>,<span class="string">"provinceID"</span>:<span class="string">"820000"</span>,<span class="string">"citys"</span>:[&#123;<span class="string">"areas"</span>:[],<span class="string">"city"</span>:<span class="string">"澳门半岛"</span>,<span class="string">"cityID"</span>:<span class="string">"820100"</span>&#125;,&#123;<span class="string">"areas"</span>:[],<span class="string">"city"</span>:<span class="string">"离岛"</span>,<span class="string">"cityID"</span>:<span class="string">"820200"</span>&#125;]&#125;&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="五级联动DEMO"><a href="#五级联动DEMO" class="headerlink" title="五级联动DEMO"></a>五级联动DEMO</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`location`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT,</span><br><span class="line">  <span class="string">`top_id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`parent_id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`name`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">''</span>,</span><br><span class="line">  <span class="string">`province_code`</span> <span class="built_in">varchar</span>(<span class="number">8</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">''</span>,</span><br><span class="line">  <span class="string">`city_code`</span> <span class="built_in">varchar</span>(<span class="number">8</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">''</span>,</span><br><span class="line">  <span class="string">`area_code`</span> <span class="built_in">varchar</span>(<span class="number">8</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">''</span>,</span><br><span class="line">  <span class="string">`street_code`</span> <span class="built_in">varchar</span>(<span class="number">16</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">''</span>,</span><br><span class="line">  <span class="string">`village_code`</span> <span class="built_in">varchar</span>(<span class="number">16</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">''</span>,</span><br><span class="line">  <span class="string">`level`</span> <span class="built_in">smallint</span>(<span class="number">1</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'1'</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>) <span class="keyword">USING</span> BTREE</span><br><span class="line">) <span class="keyword">ENGINE</span>=MyISAM <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 ROW_FORMAT=DYNAMIC;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    $dbh = <span class="keyword">new</span> PDO(<span class="string">'mysql:host=localhost;dbname=test'</span>, <span class="string">'root'</span>, <span class="string">'root'</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ($_SERVER[<span class="string">'REQUEST_METHOD'</span>] == <span class="string">'POST'</span>) &#123;</span><br><span class="line">        $type = $_POST[<span class="string">'type'</span>] ?? <span class="string">''</span>;</span><br><span class="line">        $parentId = $_POST[<span class="string">'parent_id'</span>] ?? <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">switch</span> ($type) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'province'</span>:</span><br><span class="line">                $level = <span class="number">2</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'city'</span>:</span><br><span class="line">                $level = <span class="number">3</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'area'</span>:</span><br><span class="line">                $level = <span class="number">4</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'street'</span>:</span><br><span class="line">                $level = <span class="number">5</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                $level = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $sth = $dbh-&gt;prepare(<span class="string">'SELECT * FROM `location` WHERE `parent_id` = :parentId AND `level` = :level'</span>);</span><br><span class="line">        $sth-&gt;bindParam(<span class="string">':parentId'</span>, $parentId, PDO::PARAM_INT);</span><br><span class="line">        $sth-&gt;bindParam(<span class="string">':level'</span>, $level, PDO::PARAM_INT);</span><br><span class="line">        $sth-&gt;execute();</span><br><span class="line">        $data = $sth-&gt;fetchAll(PDO::FETCH_ASSOC);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">die</span>(json_encode([<span class="string">'data'</span> =&gt; $data]));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    $level = <span class="number">1</span>;</span><br><span class="line">    $sth = $dbh-&gt;prepare(<span class="string">'SELECT * FROM `location` WHERE `level` = :level'</span>);</span><br><span class="line">    $sth-&gt;bindParam(<span class="string">':level'</span>, $level, PDO::PARAM_INT);</span><br><span class="line">    $sth-&gt;execute();</span><br><span class="line">    $provinceList = $sth-&gt;fetchAll(PDO::FETCH_ASSOC);</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="keyword">Exception</span> $e) &#123;</span><br><span class="line">    <span class="keyword">die</span>($e-&gt;getMessage());</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=<span class="string">"UTF-8"</span>&gt;</span><br><span class="line">    &lt;link href=<span class="string">"layui/css/layui.css"</span> rel=<span class="string">"stylesheet"</span> media=<span class="string">"all"</span> /&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;div class="layui-layout layui-layout-admin"&gt;</span><br><span class="line">    &lt;div class="layui-body"&gt;</span><br><span class="line">        &lt;form class="layui-form" action=""&gt;</span><br><span class="line">            &lt;div class="layui-form-item"&gt;</span><br><span class="line">                &lt;div class="layui-input-inline"&gt;</span><br><span class="line">                    &lt;select name=<span class="string">"province"</span>&gt;</span><br><span class="line">                        &lt;option value=<span class="string">""</span>&gt;请选择省&lt;/option&gt;</span><br><span class="line">                        <span class="meta">&lt;?php</span></span><br><span class="line">                            <span class="keyword">foreach</span> ($provinceList <span class="keyword">as</span> $province) &#123;</span><br><span class="line">                                <span class="keyword">echo</span> <span class="string">"&lt;option value=\"&#123;$province['id']&#125;\"&gt;&#123;$province['name']&#125;&lt;/option&gt;"</span>;</span><br><span class="line">                            &#125;</span><br><span class="line">                        <span class="meta">?&gt;</span></span><br><span class="line">                    &lt;/select&gt;</span><br><span class="line">                &lt;/div&gt;</span><br><span class="line">                &lt;div class="layui-input-inline"&gt;</span><br><span class="line">                    &lt;select name=<span class="string">"city"</span>&gt;</span><br><span class="line">                        &lt;option value=<span class="string">""</span>&gt;请选择市&lt;/option&gt;</span><br><span class="line">                    &lt;/select&gt;</span><br><span class="line">                &lt;/div&gt;</span><br><span class="line">                &lt;div class="layui-input-inline"&gt;</span><br><span class="line">                    &lt;select name=<span class="string">"area"</span>&gt;</span><br><span class="line">                        &lt;option value=<span class="string">""</span>&gt;请选择县/区&lt;/option&gt;</span><br><span class="line">                    &lt;/select&gt;</span><br><span class="line">                &lt;/div&gt;</span><br><span class="line">                &lt;div class="layui-input-inline"&gt;</span><br><span class="line">                    &lt;select name=<span class="string">"street"</span>&gt;</span><br><span class="line">                        &lt;option value=<span class="string">""</span>&gt;请选择街道&lt;/option&gt;</span><br><span class="line">                    &lt;/select&gt;</span><br><span class="line">                &lt;/div&gt;</span><br><span class="line">                &lt;div class="layui-input-inline"&gt;</span><br><span class="line">                    &lt;select name=<span class="string">"village"</span>&gt;</span><br><span class="line">                        &lt;option value=<span class="string">""</span>&gt;请选择居委会&lt;/option&gt;</span><br><span class="line">                    &lt;/select&gt;</span><br><span class="line">                &lt;/div&gt;</span><br><span class="line">            &lt;/div&gt;</span><br><span class="line">        &lt;/form&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;script src=<span class="string">"jquery-3.3.1.min.js"</span>&gt;&lt;/script&gt;</span><br><span class="line">&lt;script src=<span class="string">"layui/layui.all.js"</span>&gt;&lt;/script&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    layui.<span class="keyword">use</span>([<span class="string">'form'</span>], <span class="function"><span class="keyword">function</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> form = layui.form;</span><br><span class="line"></span><br><span class="line">        form.on(<span class="string">'select'</span>, <span class="function"><span class="keyword">function</span><span class="params">(data)</span> </span>&#123;</span><br><span class="line">            let id = data.value;</span><br><span class="line">            let type = data.elem.name;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (id !== <span class="string">''</span> &amp;&amp; type !== <span class="string">'village'</span>) &#123;</span><br><span class="line">                $.ajax(&#123;</span><br><span class="line">                    url: <span class="string">''</span>,</span><br><span class="line">                    type: <span class="string">'POST'</span>,</span><br><span class="line">                    data: &#123;type: type, parent_id: id&#125;,</span><br><span class="line">                    dataType: <span class="string">'JSON'</span>,</span><br><span class="line">                &#125;).done(<span class="function"><span class="keyword">function</span><span class="params">(response)</span> </span>&#123;</span><br><span class="line">                    let data = response.data;</span><br><span class="line">                    let obj;</span><br><span class="line">                    <span class="keyword">switch</span> (type) &#123;</span><br><span class="line">                        <span class="keyword">case</span> <span class="string">'province'</span>:</span><br><span class="line">                            obj = $(<span class="string">'select[name="city"]'</span>);</span><br><span class="line">                            obj.html(<span class="string">'&lt;option value=""&gt;请选择市&lt;/option&gt;'</span>);</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        <span class="keyword">case</span> <span class="string">'city'</span>:</span><br><span class="line">                            obj = $(<span class="string">'select[name="area"]'</span>);</span><br><span class="line">                            obj.html(<span class="string">'&lt;option value=""&gt;请选择县/区&lt;/option&gt;'</span>);</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        <span class="keyword">case</span> <span class="string">'area'</span>:</span><br><span class="line">                            obj = $(<span class="string">'select[name="street"]'</span>);</span><br><span class="line">                            obj.html(<span class="string">'&lt;option value=""&gt;请选择街道&lt;/option&gt;'</span>);</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        <span class="keyword">case</span> <span class="string">'street'</span>:</span><br><span class="line">                            obj = $(<span class="string">'select[name="village"]'</span>);</span><br><span class="line">                            obj.html(<span class="string">'&lt;option value=""&gt;请选择居委会&lt;/option&gt;'</span>);</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    $.each(data, <span class="function"><span class="keyword">function</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                        let option = `&lt;option value=<span class="string">"$&#123;this.id&#125;"</span>&gt;$&#123;this.name&#125;&lt;/option&gt;`;</span><br><span class="line">                        obj.append(option);</span><br><span class="line">                    &#125;);</span><br><span class="line">                    form.render();</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>Mr</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://sevming.github.io/PHP/linkage.html" title="全国省市区乡村五级联动">http://sevming.github.io/PHP/linkage.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/php/" rel="tag"># php</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/PHP/html-to-pdf-image.html" rel="next" title="HTML 转 PDF 或 图片">
+                <i class="fa fa-chevron-left"></i> HTML 转 PDF 或 图片
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/PHP/timed-task.html" rel="prev" title="数据库动态配置定时任务">
+                数据库动态配置定时任务 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.png"
+                alt="Mr" />
+            
+              <p class="site-author-name" itemprop="name">Mr</p>
+              <p class="site-description motion-element" itemprop="description">懒........</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">102</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://novnan.github.io" title="Novnan" target="_blank">Novnan</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://zhengyongshun.com" title="挨踢Blog" target="_blank">挨踢Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://25550808.github.io" title="Eagle" target="_blank">Eagle</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://luscio.github.io" title="Timber" target="_blank">Timber</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://952425340.github.io" title="谢炳南" target="_blank">谢炳南</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#三级联动SQL-包含港澳台-密码：k6l9"><span class="nav-number">1.</span> <span class="nav-text">三级联动SQL(包含港澳台), 密码：k6l9</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#港澳台JSON数据"><span class="nav-number">2.</span> <span class="nav-text">港澳台JSON数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#五级联动DEMO"><span class="nav-number">3.</span> <span class="nav-text">五级联动DEMO</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mr</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.2"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#more");
+  
+  </script>
+
+
+</body>
+</html>

@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="ffmpeg,nginx," />
+
+
+<meta name="description" content="项目目录：/www/ffmpeg环境要求：ffmpeg + nginx + php + nginx-rtmp-moduleH5直播要求：需运行在线上服务器,并申请SSL证书 ( getUserMedia需要https支持 )目前FFmpeg推流及H5录制已初步实现,但是FFmpeg如何实时推送H5录制的视频,还未实现 rtmp 安装 及配置12345678910111213141516171819">
+<meta name="keywords" content="ffmpeg,nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FFmpeg + nginx + rtmp 实现推流">
+<meta property="og:url" content="http://sevming.github.io/FFmpeg/ffmpeg-nginx-rtmp.html">
+<meta property="og:site_name" content="Mr.Blog">
+<meta property="og:description" content="项目目录：/www/ffmpeg环境要求：ffmpeg + nginx + php + nginx-rtmp-moduleH5直播要求：需运行在线上服务器,并申请SSL证书 ( getUserMedia需要https支持 )目前FFmpeg推流及H5录制已初步实现,但是FFmpeg如何实时推送H5录制的视频,还未实现 rtmp 安装 及配置12345678910111213141516171819">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-07-15T04:00:35.440Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="FFmpeg + nginx + rtmp 实现推流">
+<meta name="twitter:description" content="项目目录：/www/ffmpeg环境要求：ffmpeg + nginx + php + nginx-rtmp-moduleH5直播要求：需运行在线上服务器,并申请SSL证书 ( getUserMedia需要https支持 )目前FFmpeg推流及H5录制已初步实现,但是FFmpeg如何实时推送H5录制的视频,还未实现 rtmp 安装 及配置12345678910111213141516171819">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Mr.Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://sevming.github.io/FFmpeg/ffmpeg-nginx-rtmp.html"/>
+
+
+  <title>FFmpeg + nginx + rtmp 实现推流 | Mr.Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr.Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+  
+  
+  
+    <a href="https://github.com/sevming" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sevming.github.io/FFmpeg/ffmpeg-nginx-rtmp.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mr">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr.Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">FFmpeg + nginx + rtmp 实现推流</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-02T00:00:31+00:00">2019-04-02</time>
+            
+
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/FFmpeg/" itemprop="url" rel="index"><span itemprop="name">FFmpeg</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <div class="note danger"><p>项目目录：/www/ffmpeg<br>环境要求：ffmpeg + nginx + php + <a href="https://github.com/arut/nginx-rtmp-module" target="_blank" rel="noopener">nginx-rtmp-module</a><br>H5直播要求：需运行在线上服务器,并申请SSL证书 ( getUserMedia需要https支持 )<br><code>目前FFmpeg推流及H5录制已初步实现,但是FFmpeg如何实时推送H5录制的视频,还未实现</code></p></div>
+<h5 id="rtmp-安装-及配置"><a href="#rtmp-安装-及配置" class="headerlink" title="rtmp 安装 及配置"></a>rtmp <a href="/Nginx/nginx-about.html">安装</a> 及配置</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 编辑 nginx.conf</span></span><br><span class="line">vi /usr/<span class="built_in">local</span>/nginx/conf/nginx.conf</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 尾部添加配置</span></span><br><span class="line"><span class="comment">#协议名称</span></span><br><span class="line">rtmp &#123;</span><br><span class="line">    <span class="comment">#服务器相关配置</span></span><br><span class="line">    server &#123;</span><br><span class="line">        <span class="comment">#监听的端口,rtmp协议的默认端口号是1935</span></span><br><span class="line">        listen 1935;</span><br><span class="line">        chunk_size 4000;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#rtmp推流请求路径</span></span><br><span class="line">        application hls &#123;</span><br><span class="line">            <span class="comment">#开启实时</span></span><br><span class="line">            live on;</span><br><span class="line">            <span class="comment">#不记录数据</span></span><br><span class="line">            record off;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 重启nginx</span></span><br><span class="line">systemctl restart nginx</span><br><span class="line"></span><br><span class="line"><span class="comment">#4. 开放1935端口</span></span><br><span class="line">iptables -I INPUT 4 -p tcp -m state --state NEW -m tcp --dport 1935 -j ACCEPT</span><br><span class="line">service iptables save</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h5 id="配置-HLS"><a href="#配置-HLS" class="headerlink" title="配置 HLS"></a>配置 HLS</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 编辑 nginx.conf</span></span><br><span class="line">vi /usr/<span class="built_in">local</span>/nginx/conf/nginx.conf</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 修改 rtmp 配置</span></span><br><span class="line"><span class="comment">#协议名称</span></span><br><span class="line">rtmp &#123;</span><br><span class="line">    <span class="comment">#服务器相关配置</span></span><br><span class="line">    server &#123;</span><br><span class="line">        <span class="comment">#监听的端口,rtmp协议的默认端口号是1935</span></span><br><span class="line">        listen 1935;</span><br><span class="line">        chunk_size 4000;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#rtmp推流请求路径</span></span><br><span class="line">        application hls &#123;</span><br><span class="line">            <span class="comment">#开启实时</span></span><br><span class="line">            live on;</span><br><span class="line">            <span class="comment">#不记录数据</span></span><br><span class="line">            record off;</span><br><span class="line"></span><br><span class="line">            hls on;</span><br><span class="line">            <span class="comment">#视频流文件目录</span></span><br><span class="line">            hls_path /data/ffmpeg/hls/<span class="built_in">test</span>;</span><br><span class="line">            hls_fragment 3s;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 修改 server 的配置</span></span><br><span class="line">server &#123;</span><br><span class="line">  <span class="comment">#加入hls支持</span></span><br><span class="line">  location /hls &#123;</span><br><span class="line">    types &#123;</span><br><span class="line">      application/x-mpegURL</span><br><span class="line">        video/mp2t ts;</span><br><span class="line">        <span class="comment">#application/vnd.apple.mpegurl m3u8;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">alias</span> /data/ffmpeg/hls/<span class="built_in">test</span>;</span><br><span class="line">    expires -1;</span><br><span class="line">    add_header Cache-Control no-cache;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#4. 重启nginx</span></span><br><span class="line">systemctl restart nginx</span><br></pre></td></tr></table></figure>
+<h5 id="FFmepg-推流"><a href="#FFmepg-推流" class="headerlink" title="FFmepg 推流"></a>FFmepg 推流</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#第一种：基于已有视频</span></span><br><span class="line">1. 将 test.mp4 上传至 /data/ffmpeg 目录下</span><br><span class="line">2. ffmpeg 目录下新建 hls 目录</span><br><span class="line"></span><br><span class="line"><span class="comment">#第二种：基于可用的 rtmp 直播源</span></span><br><span class="line">1. rtmp://live.hkstv.hk.lxdns.com/live/hks</span><br><span class="line">2. rtmp://live.hkstv.hk.lxdns.com/live/hks1</span><br><span class="line">3. rtmp://live.hkstv.hk.lxdns.com/live/hks2</span><br><span class="line"></span><br><span class="line"><span class="comment">#推流</span></span><br><span class="line">ffmpeg -re -i /data/ffmpeg/test.mp4 -vcodec copy -f flv rtmp://127.0.0.1:1935/hls/<span class="built_in">test</span></span><br><span class="line">ffmpeg -re -i rtmp://live.hkstv.hk.lxdns.com/live/hks -vcodec copy -f flv rtmp://127.0.0.1:1935/hls/<span class="built_in">test</span></span><br><span class="line"><span class="comment">#若视频没有声音,则使用以下命令推流</span></span><br><span class="line">ffmpeg -re -i /data/ffmpeg/test.mp4 -acodec copy -vcodec copy -f flv rtmp://127.0.0.1:1935/hls/<span class="built_in">test</span></span><br><span class="line">ffmpeg -re -i rtmp://live.hkstv.hk.lxdns.com/live/hks1 -acodec copy -vcodec copy -f flv rtmp://127.0.0.1:1935/hls/<span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+<h5 id="HTML-实时播放-index-html"><a href="#HTML-实时播放-index-html" class="headerlink" title="HTML 实时播放 index.html"></a>HTML 实时播放 index.html</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;!--&lt;link href=<span class="string">"https://unpkg.com/video.js/dist/video-js.css"</span> rel=<span class="string">"stylesheet"</span>&gt;--&gt;</span><br><span class="line">    &lt;link href=<span class="string">"video-js.css"</span> rel=<span class="string">"stylesheet"</span>&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!--&lt;script src=<span class="string">"https://unpkg.com/video.js/dist/video.js"</span>&gt;&lt;/script&gt;--&gt;</span><br><span class="line">    &lt;!--&lt;script src=<span class="string">"https://unpkg.com/@videojs/http-streaming/dist/videojs-http-streaming.js"</span>&gt;&lt;/script&gt;--&gt;</span><br><span class="line">    &lt;script src=<span class="string">"video.js"</span>&gt;&lt;/script&gt;</span><br><span class="line">    &lt;script src=<span class="string">"videojs-http-streaming.js"</span>&gt;&lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;video-js id=<span class="string">"my-video"</span> controls preload=<span class="string">"auto"</span> width=<span class="string">"640"</span> height=<span class="string">"268"</span>&gt;</span><br><span class="line">    &lt;<span class="built_in">source</span> src=<span class="string">"/hls/test.m3u8"</span> <span class="built_in">type</span>=<span class="string">"application/x-mpegURL"</span> /&gt;</span><br><span class="line">&lt;/video-js&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    var player = videojs(<span class="string">'my-video'</span>);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<hr>
+<div class="note primary"><p>H5 录制视频并通过websocket上传,服务端将上传的数据保存为视频</p>
+<ol>
+<li><a href="/Nginx/nginx-about.html">nginx 的 SSL/PHP 配置</a></li>
+<li>composer require workerman/workerman</li>
+<li>websocket 及 nginx 反向代理配置</li>
+<li>worker.php、recording.html 都在 /www/ffmpeg 目录下</li>
+</ol></div>
+<h5 id="第一步：服务端监听-8181-端口-worker-php"><a href="#第一步：服务端监听-8181-端口-worker-php" class="headerlink" title="第一步：服务端监听 8181 端口 worker.php"></a>第一步：服务端监听 8181 端口 worker.php</h5><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Workerman</span>\<span class="title">Worker</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">Workerman</span>\<span class="title">Protocols</span>\<span class="title">Websocket</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="string">'../vendor/autoload.php'</span>;</span><br><span class="line"></span><br><span class="line">$context = <span class="keyword">array</span>(</span><br><span class="line">    <span class="string">'ssl'</span> =&gt; <span class="keyword">array</span>(</span><br><span class="line">        <span class="string">'local_cert'</span> =&gt; <span class="string">'/usr/local/nginx/conf/cert/cert.pem'</span>,</span><br><span class="line">        <span class="string">'local_pk'</span> =&gt; <span class="string">'/usr/local/nginx/conf/cert/cert.key'</span>,</span><br><span class="line">        <span class="string">'verify_peer'</span> =&gt; <span class="keyword">false</span>,</span><br><span class="line">    )</span><br><span class="line">);</span><br><span class="line">$worker = <span class="keyword">new</span> Worker(<span class="string">'websocket://0.0.0.0:8181'</span>, $context);</span><br><span class="line">$worker-&gt;transport = <span class="string">'ssl'</span>;</span><br><span class="line"></span><br><span class="line">$worker-&gt;onConnect = <span class="function"><span class="keyword">function</span><span class="params">($connection)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $connection-&gt;onWebSocketConnect = <span class="function"><span class="keyword">function</span><span class="params">($connection , $httpHeader)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// 二进制数据,则需要指定传输的数据类型</span></span><br><span class="line">        $connection-&gt;websocketType = Websocket::BINARY_TYPE_ARRAYBUFFER;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** <span class="doctag">@var</span> Workerman\Connection\TcpConnection $connection */</span></span><br><span class="line">$worker-&gt;onMessage = <span class="function"><span class="keyword">function</span><span class="params">($connection, $data)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 接收websocket传递的视频流并保存为webm</span></span><br><span class="line">    file_put_contents(<span class="string">'test.webm'</span>, $data, FILE_APPEND);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Worker::runAll();</span><br></pre></td></tr></table></figure>
+<h5 id="第二步：nginx-反向代理配置-websocket-完整的SSL配置"><a href="#第二步：nginx-反向代理配置-websocket-完整的SSL配置" class="headerlink" title="第二步：nginx 反向代理配置 websocket (完整的SSL配置)"></a>第二步：nginx 反向代理配置 websocket (完整的SSL配置)</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#编辑配置文件</span></span><br><span class="line">vi /usr/<span class="built_in">local</span>/nginx/conf/nginx.conf</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen       443 ssl;</span><br><span class="line">    server_name  www.xxx.com;</span><br><span class="line"></span><br><span class="line">    ssl_certificate      cert/cert.pem;</span><br><span class="line">    ssl_certificate_key  cert/cert.key;</span><br><span class="line"></span><br><span class="line">    ssl_session_cache    shared:SSL:1m;</span><br><span class="line">    ssl_session_timeout  5m;</span><br><span class="line"></span><br><span class="line">    ssl_ciphers  HIGH:!aNULL:!MD5;</span><br><span class="line">    ssl_prefer_server_ciphers  on;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        root   /www/ffmpeg;</span><br><span class="line">        index  index.html index.htm;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">#加入hls支持</span></span><br><span class="line">    location /hls &#123;</span><br><span class="line">        types &#123;</span><br><span class="line">            application/x-mpegURL</span><br><span class="line">                video/mp2t ts;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">alias</span> /data/ffmpeg/hls/<span class="built_in">test</span>;</span><br><span class="line">        expires -1;</span><br><span class="line">        add_header Cache-Control no-cache;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location /wss &#123;</span><br><span class="line">        proxy_pass https://127.0.0.1:8181;</span><br><span class="line">        proxy_http_version 1.1;</span><br><span class="line">        proxy_set_header X-Client-IP <span class="variable">$remote_addr</span>;</span><br><span class="line">        proxy_set_header Upgrade <span class="variable">$http_upgrade</span>;</span><br><span class="line">        proxy_set_header Connection <span class="string">"upgrade"</span>;</span><br><span class="line">        proxy_read_timeout 300s;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#重启</span></span><br><span class="line">service nginx restart</span><br></pre></td></tr></table></figure>
+<h5 id="第三步：编写-H5-recording-html"><a href="#第三步：编写-H5-recording-html" class="headerlink" title="第三步：编写 H5 recording.html"></a>第三步：编写 H5 recording.html</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">H5 的视频录制主要基于以下三个API</span><br><span class="line">    getUserMedia - https://developer.mozilla.org/zh-CN/docs/Web/API/MediaDevices/getUserMedia</span><br><span class="line">    MediaRecorder - https://developer.mozilla.org/zh-CN/docs/Web/API/MediaRecorder</span><br><span class="line">    FileReader - https://developer.mozilla.org/zh-CN/docs/Web/API/FileReader</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span><span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">        body &#123;</span></span><br><span class="line"><span class="undefined">            padding-top: 40px;</span></span><br><span class="line"><span class="undefined">            text-align: center;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        button &#123;</span></span><br><span class="line"><span class="undefined">            height: 40px;</span></span><br><span class="line"><span class="undefined">            line-height: 40px;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">id</span>=<span class="string">"start"</span>&gt;</span>Start Recording<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">id</span>=<span class="string">"stop"</span> <span class="attr">disabled</span>=<span class="string">""</span>&gt;</span>Stop Recording<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">hr</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">video</span> <span class="attr">controls</span>&gt;</span><span class="tag">&lt;/<span class="name">video</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">id</span>=<span class="string">"downloadLink"</span> <span class="attr">download</span>=<span class="string">"mediarecorder.webm"</span> <span class="attr">name</span>=<span class="string">"mediarecorder.webm"</span> <span class="attr">href</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span> <span class="attr">id</span>=<span class="string">"data"</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">    'use strict';</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">    // 避免重复连接</span></span><br><span class="line"><span class="undefined">    let lockReconnect = false;</span></span><br><span class="line"><span class="undefined">    let ws = null;</span></span><br><span class="line"><span class="undefined">    let wsUrl = 'wss://www.xxx.com/wss/';</span></span><br><span class="line"><span class="undefined">    createWebSocket(wsUrl);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">    // 建立websocket连接</span></span><br><span class="line"><span class="undefined">    function createWebSocket() &#123;</span></span><br><span class="line"><span class="undefined">        try &#123;</span></span><br><span class="line"><span class="undefined">            ws = new WebSocket(wsUrl);</span></span><br><span class="line"><span class="undefined">            initEventHandle();</span></span><br><span class="line"><span class="undefined">        &#125; catch (e) &#123;</span></span><br><span class="line"><span class="undefined">            reconnect(wsUrl);</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">    &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">    // 重连</span></span><br><span class="line"><span class="undefined">    function reconnect() &#123;</span></span><br><span class="line"><span class="undefined">        if (lockReconnect) &#123;</span></span><br><span class="line"><span class="undefined">            return;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">        lockReconnect = true;</span></span><br><span class="line"><span class="undefined">        setTimeout(function () &#123;</span></span><br><span class="line"><span class="undefined">            createWebSocket(wsUrl);</span></span><br><span class="line"><span class="undefined">            console.log('正在重连,当前时间：' + new Date());</span></span><br><span class="line"><span class="undefined">            lockReconnect = false;</span></span><br><span class="line"><span class="undefined">        &#125;, 3000);</span></span><br><span class="line"><span class="undefined">    &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">    // 初始化</span></span><br><span class="line"><span class="undefined">    function initEventHandle() &#123;</span></span><br><span class="line"><span class="undefined">        // 连接成功后</span></span><br><span class="line"><span class="undefined">        ws.onopen = function() &#123;</span></span><br><span class="line"><span class="undefined">            // 设置发送的信息类型为 ArrayBuffer</span></span><br><span class="line"><span class="undefined">            ws.binaryType = 'arraybuffer';</span></span><br><span class="line"><span class="undefined">            console.log('连接成功');</span></span><br><span class="line"><span class="undefined">        &#125;;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">        // 连接关闭后</span></span><br><span class="line"><span class="undefined">        ws.onclose = function() &#123;</span></span><br><span class="line"><span class="undefined">            console.log('关闭连接');</span></span><br><span class="line"><span class="undefined">            reconnect(wsUrl);</span></span><br><span class="line"><span class="undefined">        &#125;;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">        ws.onerror = function () &#123;</span></span><br><span class="line"><span class="undefined">            reconnect();</span></span><br><span class="line"><span class="undefined">        &#125;;</span></span><br><span class="line"><span class="undefined">    &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">    var video = document.querySelector('video');</span></span><br><span class="line"><span class="undefined">    var startBtn = document.querySelector('button#start');</span></span><br><span class="line"><span class="undefined">    var stopBtn = document.querySelector('button#stop');</span></span><br><span class="line"><span class="undefined">    var dataElement = document.querySelector('#data');</span></span><br><span class="line"><span class="undefined">    var downloadLink = document.querySelector('a#downloadLink')</span></span><br><span class="line"><span class="undefined">    var mediaRecorder;</span></span><br><span class="line"><span class="undefined">    var chunks = [];</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">    // 开始录制</span></span><br><span class="line"><span class="undefined">    startBtn.onclick = function () &#123;</span></span><br><span class="line"><span class="undefined">        let constraints = &#123;</span></span><br><span class="line"><span class="undefined">            audio: true,</span></span><br><span class="line"><span class="undefined">            video: &#123;</span></span><br><span class="line"><span class="undefined">                width: 300,</span></span><br><span class="line"><span class="undefined">                height: 300,</span></span><br><span class="line"><span class="undefined">                // 优先前置：user, 优先后置： exact: "environment"</span></span><br><span class="line"><span class="undefined">                //facingMode: 'user'</span></span><br><span class="line"><span class="undefined">                facingMode: &#123;exact: "environment"&#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">            &#125;</span></span><br><span class="line"><span class="undefined">        &#125;;</span></span><br><span class="line"><span class="undefined">        navigator.mediaDevices.getUserMedia(constraints).then(function(stream) &#123;</span></span><br><span class="line"><span class="undefined">            video.srcObject = stream;</span></span><br><span class="line"><span class="undefined">            video.onloadedmetadata = function(e) &#123;</span></span><br><span class="line"><span class="undefined">                video.play();</span></span><br><span class="line"><span class="undefined">            &#125;;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">            let timeslice = 10;</span></span><br><span class="line"><span class="undefined">            mediaRecorder = new MediaRecorder(stream);</span></span><br><span class="line"><span class="undefined">            // 启动视频捕获,若设置毫秒值,则录制的媒体会分割成一个个单独的区块,而不是一个非常大的整块内容</span></span><br><span class="line"><span class="undefined">            mediaRecorder.start(timeslice);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">            // 视频数据捕获之后触发事件,若MediaRecorder.start()设置了timeslice,则dataavailable每隔timeslice毫秒触发一次事件</span></span><br><span class="line"><span class="undefined">            mediaRecorder.ondataavailable = function(e) &#123;</span></span><br><span class="line"><span class="undefined">                chunks.push(e.data);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                var reader = new FileReader();</span></span><br><span class="line"><span class="undefined">                // 当读取操作完成时,触发loadend事件,同时result将包含一个ArrayBuffer对象(Blob文件中的数据)</span></span><br><span class="line"><span class="undefined">                reader.addEventListener('loadend', function() &#123;</span></span><br><span class="line"><span class="undefined">                    // 创建视图</span></span><br><span class="line"><span class="undefined">                    var buf = new Uint8Array(reader.result);</span></span><br><span class="line"><span class="undefined">                    if (reader.result.byteLength &gt; 0) &#123;</span></span><br><span class="line"><span class="undefined">                        ws.send(buf);</span></span><br><span class="line"><span class="undefined">                    &#125;</span></span><br><span class="line"><span class="undefined">                &#125;);</span></span><br><span class="line"><span class="undefined">                // 读取Blob对象并转化为ArrayBuffer</span></span><br><span class="line"><span class="undefined">                reader.readAsArrayBuffer(e.data);</span></span><br><span class="line"><span class="undefined">            &#125;;</span></span><br><span class="line"><span class="undefined">        &#125;).catch(function (error) &#123;</span></span><br><span class="line"><span class="undefined">            alert('Unable to capture your camera. Please check console logs.');</span></span><br><span class="line"><span class="undefined">            console.log(error);</span></span><br><span class="line"><span class="undefined">        &#125;);</span></span><br><span class="line"><span class="undefined">    &#125;;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">    function log(message) &#123;</span></span><br><span class="line"><span class="xml">        dataElement.innerHTML = dataElement.innerHTML + '<span class="tag">&lt;<span class="name">br</span> /&gt;</span>' + message;</span></span><br><span class="line"><span class="undefined">    &#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h5 id="客户端视频播放页面"><a href="#客户端视频播放页面" class="headerlink" title="客户端视频播放页面"></a>客户端视频播放页面</h5><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"https://unpkg.com/video.js/dist/video-js.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://unpkg.com/video.js/dist/video.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://unpkg.com/@videojs/http-streaming/dist/videojs-http-streaming.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">video-js</span> <span class="attr">id</span>=<span class="string">"my-video"</span> <span class="attr">controls</span> <span class="attr">preload</span>=<span class="string">"auto"</span> <span class="attr">width</span>=<span class="string">"640"</span> <span class="attr">height</span>=<span class="string">"268"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">source</span> <span class="attr">src</span>=<span class="string">"/hls/test.m3u8"</span> <span class="attr">type</span>=<span class="string">"application/x-mpegURL"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">video-js</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">    var player = videojs('my-video');</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h5 id="测试流程"><a href="#测试流程" class="headerlink" title="测试流程"></a>测试流程</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1. 启动 worker.php</span><br><span class="line">php worker.php start</span><br><span class="line"></span><br><span class="line">2. 手机打开链接 https://www.xxx.com/recording.html, 并点击 `Start Recording` 按钮</span><br><span class="line"></span><br><span class="line">3. 查看 /www/ffmpeg 目录, 会生成一个新的文件 test.webm 文件 ( H5 录制的内容 )</span><br><span class="line"></span><br><span class="line">4. 将 test.webm 通过 ffmpeg 转为 mp4</span><br><span class="line">ffmpeg -i test.webm -vf <span class="string">"scale=trunc(iw/2)*2:trunc(ih/2)*2"</span> test.mp4</span><br><span class="line"></span><br><span class="line">5. 转换后的 mp4 就可以使用 ffmpeg 推流</span><br><span class="line">ffmpeg -re -i test.mp4 -acodec copy -vcodec copy -f flv rtmp://127.0.0.1:1935/hls/<span class="built_in">test</span></span><br><span class="line"></span><br><span class="line">6. 访问 https://www.xxx.com/index.html</span><br></pre></td></tr></table></figure>
+<div class="note warning"><p>参考资料</p></div>
+<p><a href="https://www.cnblogs.com/shihuc/p/7603600.html" target="_blank" rel="noopener">基于H5的摄像头视频数据流采集</a><br><a href="https://www.jianshu.com/p/0296a7be7928" target="_blank" rel="noopener">基于Nginx搭建RTMP/HLS视频直播服务器</a><br><a href="https://aotu.io/notes/2016/10/09/HTML5-SopCast/index.html" target="_blank" rel="noopener">H5直播起航</a><br><a href="https://www.nihaoshijie.com.cn/index.php/archives/615/" target="_blank" rel="noopener">H5视频直播扫盲</a></p>
+<hr>
+<div class="note danger"><p>网页播放m3u8</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 准备好视频 input.mp4</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 将视频文件转为视频编码h.264, 音频编码aac格式的mp4文件 (使用ffprobe查看文件编码方式)</span></span><br><span class="line">ffprobe input.mp4</span><br><span class="line"><span class="comment">#若不是mp4,运行以下命令转换</span></span><br><span class="line">ffmpeg -i input.mkv -acodec copy -vcodec copy input.mp4 </span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 将mp4转为完整的ts</span></span><br><span class="line">ffmpeg -i input.mp4 -vcodec copy -acodec copy -vbsf h264_mp4toannexb output.ts</span><br><span class="line"></span><br><span class="line"><span class="comment">#4. 将ts切片,并生成m3u8文件 (segment_time 隔几秒切一个文件)</span></span><br><span class="line">ffmpeg -i output.ts -c copy -map 0 -f segment -segment_list play.m3u8 -segment_time 5 output%03d.ts</span><br><span class="line"></span><br><span class="line"><span class="comment">#5. 新建 index.html 文件,代码如下</span></span><br><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;link href=<span class="string">"https://unpkg.com/video.js/dist/video-js.css"</span> rel=<span class="string">"stylesheet"</span>&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;video-js id=<span class="string">"my-video"</span> controls preload=<span class="string">"auto"</span> width=<span class="string">"640"</span> height=<span class="string">"268"</span>&gt;</span><br><span class="line">        &lt;<span class="built_in">source</span> src=<span class="string">"play.m3u8"</span> <span class="built_in">type</span>=<span class="string">"application/x-mpegURL"</span>&gt;</span><br><span class="line">    &lt;/video-js&gt;</span><br><span class="line"></span><br><span class="line">    &lt;script src=<span class="string">"https://unpkg.com/video.js/dist/video.js"</span>&gt;&lt;/script&gt;</span><br><span class="line">    &lt;script src=<span class="string">"https://unpkg.com/@videojs/http-streaming/dist/videojs-http-streaming.js"</span>&gt;&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">    &lt;script&gt;</span><br><span class="line">        var player = videojs(<span class="string">'my-video'</span>);</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>Mr</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://sevming.github.io/FFmpeg/ffmpeg-nginx-rtmp.html" title="FFmpeg + nginx + rtmp 实现推流">http://sevming.github.io/FFmpeg/ffmpeg-nginx-rtmp.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ffmpeg/" rel="tag"># ffmpeg</a>
+          
+            <a href="/tags/nginx/" rel="tag"># nginx</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/FFmpeg/ffmpeg-install.html" rel="next" title="FFmpeg 安装">
+                <i class="fa fa-chevron-left"></i> FFmpeg 安装
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/Linux/aliyun-oneinstack-pure-ftpd.html" rel="prev" title="阿里云 - OneinStack 配置 pure-ftpd">
+                阿里云 - OneinStack 配置 pure-ftpd <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.png"
+                alt="Mr" />
+            
+              <p class="site-author-name" itemprop="name">Mr</p>
+              <p class="site-description motion-element" itemprop="description">懒........</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">102</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://novnan.github.io" title="Novnan" target="_blank">Novnan</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://zhengyongshun.com" title="挨踢Blog" target="_blank">挨踢Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://25550808.github.io" title="Eagle" target="_blank">Eagle</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://luscio.github.io" title="Timber" target="_blank">Timber</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://952425340.github.io" title="谢炳南" target="_blank">谢炳南</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#rtmp-安装-及配置"><span class="nav-number">1.</span> <span class="nav-text">rtmp 安装 及配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#配置-HLS"><span class="nav-number">2.</span> <span class="nav-text">配置 HLS</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#FFmepg-推流"><span class="nav-number">3.</span> <span class="nav-text">FFmepg 推流</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#HTML-实时播放-index-html"><span class="nav-number">4.</span> <span class="nav-text">HTML 实时播放 index.html</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#第一步：服务端监听-8181-端口-worker-php"><span class="nav-number">5.</span> <span class="nav-text">第一步：服务端监听 8181 端口 worker.php</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#第二步：nginx-反向代理配置-websocket-完整的SSL配置"><span class="nav-number">6.</span> <span class="nav-text">第二步：nginx 反向代理配置 websocket (完整的SSL配置)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#第三步：编写-H5-recording-html"><span class="nav-number">7.</span> <span class="nav-text">第三步：编写 H5 recording.html</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#客户端视频播放页面"><span class="nav-number">8.</span> <span class="nav-text">客户端视频播放页面</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#测试流程"><span class="nav-number">9.</span> <span class="nav-text">测试流程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mr</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.2"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#more");
+  
+  </script>
+
+
+</body>
+</html>

@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="php,socket," />
+
+
+<meta name="description" content="PHP Socket 编程提供了两套API：socket_* 系列, 需要安装 socket 扩展(更底层)stream_socket_* 系列, 不需要安装扩展(推荐使用, 更方便) ps:分别以 socket 扩展 和 stream_socket 实现了服务端与客户端的通信,测试方式一样">
+<meta name="keywords" content="php,socket">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP Socket 服务端与客户端的通信(IO阻塞&#x2F;复用)">
+<meta property="og:url" content="http://sevming.github.io/PHP/socket.html">
+<meta property="og:site_name" content="Mr.Blog">
+<meta property="og:description" content="PHP Socket 编程提供了两套API：socket_* 系列, 需要安装 socket 扩展(更底层)stream_socket_* 系列, 不需要安装扩展(推荐使用, 更方便) ps:分别以 socket 扩展 和 stream_socket 实现了服务端与客户端的通信,测试方式一样">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-07-15T04:00:35.450Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP Socket 服务端与客户端的通信(IO阻塞&#x2F;复用)">
+<meta name="twitter:description" content="PHP Socket 编程提供了两套API：socket_* 系列, 需要安装 socket 扩展(更底层)stream_socket_* 系列, 不需要安装扩展(推荐使用, 更方便) ps:分别以 socket 扩展 和 stream_socket 实现了服务端与客户端的通信,测试方式一样">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Mr.Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://sevming.github.io/PHP/socket.html"/>
+
+
+  <title>PHP Socket 服务端与客户端的通信(IO阻塞/复用) | Mr.Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr.Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+  
+  
+  
+    <a href="https://github.com/sevming" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sevming.github.io/PHP/socket.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mr">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr.Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PHP Socket 服务端与客户端的通信(IO阻塞/复用)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-18T13:54:32+00:00">2018-10-18</time>
+            
+
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/PHP/" itemprop="url" rel="index"><span itemprop="name">PHP</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <div class="note danger"><p>PHP Socket 编程提供了两套API：<br><code>socket_*</code> 系列, 需要安装 socket 扩展(更底层)<br><code>stream_socket_*</code> 系列, 不需要安装扩展(推荐使用, 更方便)</p>
+<p><code>ps:分别以 socket 扩展 和 stream_socket 实现了服务端与客户端的通信,测试方式一样</code></p></div>
+<a id="more"></a>
+<hr>
+<div class="note primary"><p>socket 扩展 - 服务端与客户端的通信</p></div>
+<h6 id="服务端-server-php"><a href="#服务端-server-php" class="headerlink" title="服务端 server.php"></a>服务端 server.php</h6><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$ip = <span class="string">'127.0.0.1'</span>;</span><br><span class="line">$port = <span class="number">7000</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 建立TCP连接</span></span><br><span class="line">$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">'socket_create fail:'</span> . socket_strerror(socket_last_error()));</span><br><span class="line"><span class="comment">// 绑定IP地址和端口</span></span><br><span class="line">socket_bind($socket, $ip, $port) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">'socket_bind fail:'</span> . socket_strerror(socket_last_error()));</span><br><span class="line"><span class="comment">// 监听客户端连接</span></span><br><span class="line">socket_listen($socket, <span class="number">2</span>) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">'socket_listen fail:'</span> . socket_strerror(socket_last_error()));</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    <span class="comment">// 接受一个客户端的连接请求,并返回一个新的套接字</span></span><br><span class="line">    $newSocket = socket_accept($socket);</span><br><span class="line">    <span class="keyword">if</span> ($newSocket === <span class="keyword">false</span>) &#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">'socket_accept fail:'</span> . socket_strerror(socket_last_error());</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 向客户端发送数据, 告知客户端ID</span></span><br><span class="line">        $clientId = (int)$newSocket;</span><br><span class="line">        $response = [</span><br><span class="line">            <span class="string">'type'</span> =&gt; <span class="string">'login'</span>,</span><br><span class="line">            <span class="string">'message'</span> =&gt; $clientId,</span><br><span class="line">        ];</span><br><span class="line">        socket_write($newSocket, json_encode($response) . <span class="string">"\n"</span>);</span><br><span class="line">        <span class="comment">// 输出客户端信息</span></span><br><span class="line">        socket_getpeername($newSocket, $address, $port);</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"Client #&#123;$clientId&#125; Connected, IP=&#123;$address&#125;, PORT=&#123;$port&#125;."</span> . PHP_EOL;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="comment">// 读取客户端数据</span></span><br><span class="line">            $data = @socket_read($newSocket, <span class="number">2048</span>);</span><br><span class="line">            <span class="keyword">if</span> ($data !== <span class="string">''</span>) &#123;</span><br><span class="line">                $data = trim($data);</span><br><span class="line">                <span class="comment">// 发送内容给客户端</span></span><br><span class="line">                $response = [</span><br><span class="line">                    <span class="string">'message'</span> =&gt; strrev($data),</span><br><span class="line">                    <span class="string">'time'</span> =&gt; date(<span class="string">'Y-m-d H:i:s'</span>),</span><br><span class="line">                ];</span><br><span class="line">                socket_write($read, json_encode($response) . <span class="string">"\n"</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                socket_close($newSocket);</span><br><span class="line">                <span class="comment">// 输出客户端断开连接</span></span><br><span class="line">                <span class="keyword">echo</span> <span class="string">"Client #&#123;$clientId&#125; Disconnect."</span> . PHP_EOL;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 关闭TCP连接</span></span><br><span class="line">socket_close($socket);</span><br></pre></td></tr></table></figure>
+<h6 id="客户端-client-php"><a href="#客户端-client-php" class="headerlink" title="客户端 client.php"></a>客户端 client.php</h6><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$ip = <span class="string">'127.0.0.1'</span>;</span><br><span class="line">$port = <span class="number">7000</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 建立TCP连接</span></span><br><span class="line">$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">'socket_create fail:'</span> . socket_strerror(socket_last_error()));</span><br><span class="line"><span class="comment">// 连接服务端</span></span><br><span class="line">socket_connect($socket, $ip, $port) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">'socket_connect fail:'</span> . socket_strerror(socket_last_error()));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取服务端数据</span></span><br><span class="line">$buffer = socket_read($socket, <span class="number">2048</span>, PHP_NORMAL_READ);</span><br><span class="line">$data = json_decode($buffer, <span class="keyword">true</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"Connection succeeded, ClientId = #&#123;$data['message']&#125;."</span> . PHP_EOL;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 客户端与服务端交互</span></span><br><span class="line">interaction($socket);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">interaction</span><span class="params">($socket)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 获取客户端输入</span></span><br><span class="line">    $content = trim(fgets(STDIN));</span><br><span class="line">    <span class="comment">// 发送数据给服务端</span></span><br><span class="line">    socket_write($socket, $content);</span><br><span class="line">    <span class="comment">// 读取服务端</span></span><br><span class="line">    $buffer = socket_read($socket, <span class="number">2048</span>, PHP_NORMAL_READ);</span><br><span class="line">    $data = json_decode($buffer, <span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&#123;$data['message']&#125; - &#123;$data['time']&#125;"</span> . PHP_EOL;</span><br><span class="line"></span><br><span class="line">    interaction($socket);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 关闭TCP连接</span></span><br><span class="line">socket_close($socket);</span><br></pre></td></tr></table></figure>
+<h6 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h6><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 启动服务端</span></span><br><span class="line">php server.php</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 运行客户端, 并输入 'hello', 然后断开连接</span></span><br><span class="line">[root@192 private]<span class="comment"># php client.php </span></span><br><span class="line">Connection succeeded, ClientId = <span class="comment">#18.</span></span><br><span class="line">hello</span><br><span class="line">olleh - 2018-10-17 17:59:20</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 服务端输出</span></span><br><span class="line">[root@192 private]<span class="comment"># php socket.php </span></span><br><span class="line">Client <span class="comment">#17 Connected, IP=127.0.0.1, PORT=33994.</span></span><br><span class="line">Client <span class="comment">#17 Disconnect.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#4. 客户端也可以使用 telnet </span></span><br><span class="line">[root@192 ~]<span class="comment"># telnet 127.0.0.1 7000</span></span><br><span class="line">Trying 127.0.0.1...</span><br><span class="line">Connected to 127.0.0.1.</span><br><span class="line">Escape character is <span class="string">'^]'</span>.</span><br><span class="line">&#123;<span class="string">"type"</span>:<span class="string">"login"</span>,<span class="string">"message"</span>:17&#125;</span><br><span class="line">hello</span><br><span class="line">&#123;<span class="string">"message"</span>:<span class="string">"olleh"</span>,<span class="string">"time"</span>:<span class="string">"2018-10-17 17:58:06"</span>&#125;</span><br><span class="line">^]</span><br><span class="line">telnet&gt; quit</span><br><span class="line">Connection closed.</span><br></pre></td></tr></table></figure>
+<div class="note warning"><p>问题：只能处理一个客户端的连接和数据传输, 只有断开后才能处理新的客户端连接<br>解决：IO 复用</p></div>
+<h6 id="IO-复用-服务端-server-php"><a href="#IO-复用-服务端-server-php" class="headerlink" title="IO 复用 - 服务端 server.php"></a>IO 复用 - 服务端 server.php</h6><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$ip = <span class="string">'127.0.0.1'</span>;</span><br><span class="line">$port = <span class="number">7000</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 建立TCP连接</span></span><br><span class="line">$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">'socket_create fail:'</span> . socket_strerror(socket_last_error()));</span><br><span class="line"><span class="comment">// 绑定IP地址和端口</span></span><br><span class="line">socket_bind($socket, $ip, $port) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">'socket_bind fail:'</span> . socket_strerror(socket_last_error()));</span><br><span class="line"><span class="comment">// 监听客户端连接</span></span><br><span class="line">socket_listen($socket, <span class="number">2</span>) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">'socket_listen fail:'</span> . socket_strerror(socket_last_error()));</span><br><span class="line"><span class="comment">// 客户端集合</span></span><br><span class="line">$clients[(int)$socket] = $socket;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    <span class="comment">// socket_select() 的 $read、$write、$except 三个参数都是引用地址类型, 所以需要将 $clients 赋值给 $reads, 保证 $reads 发生改动后不影响 $clients</span></span><br><span class="line">    $reads = $clients;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接受套接字数组并等待它们改变状态</span></span><br><span class="line">    <span class="keyword">if</span> (socket_select($reads, $writes, $excepts, <span class="keyword">null</span>) === <span class="keyword">false</span>) &#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">'socket_select fail：'</span> . socket_strerror(socket_last_error()) . PHP_EOL;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// $socket 发生变化, 说明有新的客户端连接</span></span><br><span class="line">    <span class="keyword">if</span> (in_array($socket, $reads)) &#123;</span><br><span class="line">        <span class="comment">// 接受一个客户端的连接请求,并返回一个新的套接字</span></span><br><span class="line">        $newSocket = socket_accept($socket);</span><br><span class="line">        <span class="keyword">if</span> ($newSocket === <span class="keyword">false</span>) &#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">'socket_accept fail:'</span> . socket_strerror(socket_last_error()) . PHP_EOL;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 向客户端发送数据, 告知客户端ID</span></span><br><span class="line">            $clientId = (int)$newSocket;</span><br><span class="line">            $response = [</span><br><span class="line">                <span class="string">'type'</span> =&gt; <span class="string">'login'</span>,</span><br><span class="line">                <span class="string">'message'</span> =&gt; $clientId,</span><br><span class="line">            ];</span><br><span class="line">            socket_write($newSocket, json_encode($response) . <span class="string">"\n"</span>);</span><br><span class="line">            <span class="comment">// 将客户端 $newSocket 加入到 $clients</span></span><br><span class="line">            $clients[$clientId] = $newSocket;</span><br><span class="line">            <span class="comment">// 移除对 $socket 的监听</span></span><br><span class="line">            <span class="keyword">unset</span>($reads[array_search($socket, $reads)]);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 输出客户端信息</span></span><br><span class="line">            socket_getpeername($newSocket, $address, $port);</span><br><span class="line">            $content = <span class="string">"Client #&#123;$clientId&#125; Connected, IP=&#123;$address&#125;, PORT=&#123;$port&#125;."</span> . PHP_EOL;</span><br><span class="line">            <span class="keyword">echo</span> $content;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 通知所有客户端,不包含当前客户端</span></span><br><span class="line">            <span class="comment">/*foreach ($clients as $client) &#123;</span></span><br><span class="line"><span class="comment">                if ($client != $socket &amp;&amp; $client != $newSocket) &#123;</span></span><br><span class="line"><span class="comment">                    <span class="doctag">@socket</span>_write($client, $content);</span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment">            &#125;*/</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">foreach</span> ($reads <span class="keyword">as</span> $key =&gt; $read) &#123;</span><br><span class="line">        <span class="comment">// 读取客户端数据</span></span><br><span class="line">        $data = @socket_read($read, <span class="number">2048</span>);</span><br><span class="line">        $clientId = (int)$read;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> ($data !== <span class="string">''</span>) &#123;</span><br><span class="line">            $data = trim($data);</span><br><span class="line">            <span class="comment">// 发送内容给客户端</span></span><br><span class="line">            $response = [</span><br><span class="line">                <span class="string">'message'</span> =&gt; strrev($data),</span><br><span class="line">                <span class="string">'time'</span> =&gt; date(<span class="string">'Y-m-d H:i:s'</span>),</span><br><span class="line">            ];</span><br><span class="line">            socket_write($read, json_encode($response) . <span class="string">"\n"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 移除对 $read 的监听</span></span><br><span class="line">            <span class="keyword">unset</span>($clients[$clientId]);</span><br><span class="line">            <span class="comment">// 关闭 $read 连接</span></span><br><span class="line">            socket_close($read);</span><br><span class="line">            <span class="comment">// 输出客户端断开连接</span></span><br><span class="line">            <span class="keyword">echo</span> <span class="string">"Client #&#123;$clientId&#125; Disconnect."</span> . PHP_EOL;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 关闭TCP连接</span></span><br><span class="line">socket_close($socket);</span><br></pre></td></tr></table></figure>
+<h6 id="测试-1"><a href="#测试-1" class="headerlink" title="测试"></a>测试</h6><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 启动服务端</span></span><br><span class="line">php server.php</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 运行多个客户端, 并输入 'hello', 然后断开连接</span></span><br><span class="line">[root@192 private]<span class="comment"># php client.php </span></span><br><span class="line">Connection succeeded, ClientId = <span class="comment">#17.</span></span><br><span class="line">hello</span><br><span class="line">olleh - 2018-10-17 17:59:20</span><br><span class="line"></span><br><span class="line">[root@192 private]<span class="comment"># php client.php </span></span><br><span class="line">Connection succeeded, ClientId = <span class="comment">#18.</span></span><br><span class="line">hello</span><br><span class="line">olleh - 2018-10-17 17:59:24</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 服务端输出</span></span><br><span class="line">[root@192 private]<span class="comment"># php socket.php </span></span><br><span class="line">Client <span class="comment">#17 Connected, IP=127.0.0.1, PORT=34138.</span></span><br><span class="line">Client <span class="comment">#18 Connected, IP=127.0.0.1, PORT=34141.</span></span><br><span class="line">Client <span class="comment">#17 Disconnect.</span></span><br><span class="line">Client <span class="comment">#18 Disconnect.</span></span><br></pre></td></tr></table></figure>
+<hr>
+<div class="note primary"><p>stream_socket - 服务端与客户端的通信</p></div>
+<h5 id="服务端-server-php-1"><a href="#服务端-server-php-1" class="headerlink" title="服务端 server.php"></a>服务端 server.php</h5><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$socketName = <span class="string">'tcp://127.0.0.1:7000'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 建立连接</span></span><br><span class="line">$socket = stream_socket_server($socketName, $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN);</span><br><span class="line"><span class="keyword">if</span> (!$socket) &#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">"stream_socket_server fail：&#123;$errstr&#125; (&#123;$errno&#125;)"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 接受由 stream_socket_server() 创建的套接字连接,返回接受套接之后的资源流</span></span><br><span class="line"><span class="keyword">while</span> ($conn = @stream_socket_accept($socket, <span class="number">-1</span>, $remoteAddress)) &#123;</span><br><span class="line">    <span class="comment">// 向客户端发送数据, 告知客户端ID</span></span><br><span class="line">    $clientId = (int)$conn;</span><br><span class="line">    $response = [</span><br><span class="line">        <span class="string">'type'</span> =&gt; <span class="string">'login'</span>,</span><br><span class="line">        <span class="string">'message'</span> =&gt; $clientId,</span><br><span class="line">    ];</span><br><span class="line">    stream_socket_sendto($conn, json_encode($response) . <span class="string">"\n"</span>);</span><br><span class="line">    <span class="comment">// 输出客户端信息</span></span><br><span class="line">    <span class="keyword">list</span> ($address, $port) = explode(<span class="string">':'</span>, $remoteAddress);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"Client #&#123;$clientId&#125; Connected, IP=&#123;$address&#125;, PORT=&#123;$port&#125;."</span> . PHP_EOL;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        <span class="comment">// 读取客户端数据</span></span><br><span class="line">        $data = stream_socket_recvfrom($conn, <span class="number">2048</span>);</span><br><span class="line">        <span class="keyword">if</span> ($data !== <span class="string">''</span> &amp;&amp; $data !== <span class="keyword">false</span>) &#123;</span><br><span class="line">            $data = trim($data);</span><br><span class="line">            <span class="comment">// 发送内容给客户端</span></span><br><span class="line">            $response = [</span><br><span class="line">                <span class="string">'message'</span> =&gt; strrev($data),</span><br><span class="line">                <span class="string">'time'</span> =&gt; date(<span class="string">'Y-m-d H:i:s'</span>),</span><br><span class="line">            ];</span><br><span class="line">            stream_socket_sendto($conn, json_encode($response) . <span class="string">"\n"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            fclose($conn);</span><br><span class="line">            <span class="comment">// 输出客户端断开连接</span></span><br><span class="line">            <span class="keyword">echo</span> <span class="string">"Client #&#123;$clientId&#125; Disconnect."</span> . PHP_EOL;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 关闭连接</span></span><br><span class="line">fclose($socket);</span><br></pre></td></tr></table></figure>
+<h6 id="客户端-client-php-1"><a href="#客户端-client-php-1" class="headerlink" title="客户端 client.php"></a>客户端 client.php</h6><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$socketName = <span class="string">'tcp://127.0.0.1:7000'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 建立连接</span></span><br><span class="line">$socket = stream_socket_client($socketName, $errno, $errstr, <span class="number">30</span>);</span><br><span class="line"><span class="keyword">if</span> (!$socket) &#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">"stream_socket_client fail：&#123;$errstr&#125; (&#123;$errno&#125;)"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取服务端数据</span></span><br><span class="line">$buffer = stream_socket_recvfrom($socket, <span class="number">2048</span>);</span><br><span class="line">$data = json_decode($buffer, <span class="keyword">true</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"Connection succeeded, ClientId = #&#123;$data['message']&#125;."</span> . PHP_EOL;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 客户端与服务端交互</span></span><br><span class="line">interaction($socket);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">interaction</span><span class="params">($socket)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 获取客户端输入</span></span><br><span class="line">    $content = trim(fgets(STDIN));</span><br><span class="line">    <span class="comment">// 发送数据给服务端</span></span><br><span class="line">    stream_socket_sendto($socket, $content);</span><br><span class="line">    <span class="comment">// 读取服务端</span></span><br><span class="line">    $buffer = stream_socket_recvfrom($socket, <span class="number">2048</span>);</span><br><span class="line">    $data = json_decode($buffer, <span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&#123;$data['message']&#125; - &#123;$data['time']&#125;"</span> . PHP_EOL;</span><br><span class="line"></span><br><span class="line">    interaction($socket);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 关闭连接</span></span><br><span class="line">fclose($socket);</span><br></pre></td></tr></table></figure>
+<h6 id="IO-复用-服务端-server-php-1"><a href="#IO-复用-服务端-server-php-1" class="headerlink" title="IO 复用 - 服务端 server.php"></a>IO 复用 - 服务端 server.php</h6><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$socketName = <span class="string">'tcp://127.0.0.1:7000'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 建立连接</span></span><br><span class="line">$socket = stream_socket_server($socketName, $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN);</span><br><span class="line"><span class="keyword">if</span> (!$socket) &#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">"stream_socket_server fail：&#123;$errstr&#125; (&#123;$errno&#125;)"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 客户端集合</span></span><br><span class="line">$clients = [(int)$socket =&gt; $socket];</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    $reads = $clients;</span><br><span class="line">    <span class="keyword">if</span> (stream_select($reads, $writes, $excepts, <span class="keyword">null</span>) === <span class="keyword">false</span>) &#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">foreach</span> ($reads <span class="keyword">as</span> $read) &#123;</span><br><span class="line">        <span class="comment">// 新客户端连接</span></span><br><span class="line">        <span class="keyword">if</span> ($read === $socket) &#123;</span><br><span class="line">            <span class="comment">// 接受由 stream_socket_server() 创建的套接字连接,返回接受套接之后的资源流</span></span><br><span class="line">            $conn = stream_socket_accept($socket, <span class="number">0</span>, $remoteAddress);</span><br><span class="line">            <span class="comment">// 向客户端发送数据, 告知客户端ID</span></span><br><span class="line">            $clientId = (int)$conn;</span><br><span class="line">            $response = [</span><br><span class="line">                <span class="string">'type'</span> =&gt; <span class="string">'login'</span>,</span><br><span class="line">                <span class="string">'message'</span> =&gt; $clientId,</span><br><span class="line">            ];</span><br><span class="line">            stream_socket_sendto($conn, json_encode($response) . <span class="string">"\n"</span>);</span><br><span class="line">            <span class="comment">// 将客户端 $conn 加入到 $clients</span></span><br><span class="line">            $clients[$clientId] = $conn;</span><br><span class="line">            <span class="comment">// 移除对 $socket 的监听</span></span><br><span class="line">            <span class="keyword">unset</span>($reads[array_search($socket, $reads)]);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 输出客户端信息</span></span><br><span class="line">            <span class="keyword">list</span> ($address, $port) = explode(<span class="string">':'</span>, $remoteAddress);</span><br><span class="line">            $content = <span class="string">"Client #&#123;$clientId&#125; Connected, IP=&#123;$address&#125;, PORT=&#123;$port&#125;."</span> . PHP_EOL;</span><br><span class="line">            <span class="keyword">echo</span> $content;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 通知所有客户端,不包含当前客户端</span></span><br><span class="line">            <span class="comment">/*foreach ($clients as $client) &#123;</span></span><br><span class="line"><span class="comment">                if ($client != $socket &amp;&amp; $client != $conn) &#123;</span></span><br><span class="line"><span class="comment">                    stream_socket_sendto($client, $content);</span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment">            &#125;*/</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 读取客户端数据</span></span><br><span class="line">            $data = stream_socket_recvfrom($read, <span class="number">2048</span>);</span><br><span class="line">            $clientId = (int)$read;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> ($data !== <span class="string">''</span> &amp;&amp; $data !== <span class="keyword">false</span>) &#123;</span><br><span class="line">                $data = trim($data);</span><br><span class="line">                <span class="comment">// 发送内容给客户端</span></span><br><span class="line">                $response = [</span><br><span class="line">                    <span class="string">'message'</span> =&gt; strrev($data),</span><br><span class="line">                    <span class="string">'time'</span> =&gt; date(<span class="string">'Y-m-d H:i:s'</span>),</span><br><span class="line">                ];</span><br><span class="line">                stream_socket_sendto($read, json_encode($response) . <span class="string">"\n"</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 移除对 $read 的监听</span></span><br><span class="line">                <span class="keyword">unset</span>($clients[$clientId]);</span><br><span class="line">                <span class="comment">// 关闭连接</span></span><br><span class="line">                fclose($read);</span><br><span class="line">                <span class="comment">// 输出客户端断开连接</span></span><br><span class="line">                <span class="keyword">echo</span> <span class="string">"Client #&#123;$clientId&#125; Disconnect."</span> . PHP_EOL;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 关闭连接</span></span><br><span class="line">fclose($socket);</span><br></pre></td></tr></table></figure>
+<hr>
+<div class="note danger"><p>相关说明：</p>
+<ol>
+<li>socket_create 创建并返回一个套接字(用于监听[listen]和接受[accept]客户端的连接请求,不能用于与客户端之间发送和接收数据)</li>
+<li>socket_accept 接受一个客户端的连接请求, 并返回一个新的套接字, 这个套接字与socket_create 返回的用于监听和接受客户端的连接请求的套接字不是同一个套接字,与本次接受的客户端的通信是通过在这个新的套接字上发送和接收数据来完成的</li>
+<li>再次调用 socket_accept 可以接受下一个客户端的连接请求, 并再次返回一个新的套接字(与socket_create 返回的套接字、之前 socket_accept 返回的套接字都不同的新的套接字), 这个新的套接字用于与这次接受的客户端之间的通信</li>
+<li>假设一共有3个客户端连接到服务器端, 那么在服务器端就一共有4个套接字, 第1个是 socket_create 返回的(用于监听的套接字),其余3个是分别调用3次 socket_accept 返回的不同的套接字</li>
+<li>如果已经有客户端连接到服务器端, 不再需要监听和接受更多的客户端连接的时候, 可以关闭由 socket_create 返回的套接字, 而不会影响与客户端之间的通信</li>
+<li>当某个客户端断开连接、或者是与某个客户端的通信完成之后, 服务器端需要关闭用于与该客户端通信的套接字</li>
+<li>socket_listen 说明：每个 connect 都是往 listen 队列填装连接, 每一个 accept 操作都会从 listen 队列取连接转成 socket, 等待这个socket close 掉之后再继续从 listen 队列中取连接, 而 listen 队列长度就是 socket_listen 函数的第二个参数 backlog</li>
+<li>socket_select 接受三个套接字数组, 分别检查数组中的套接字是否处于可以操作的状态(返回时只保留可操作的套接字), 使用最多的是 $read, 因此以读为例.<br>在套接字数组 $read 中最初应保有一个服务端监听套接字, 每当该套接字可读时, 就表示有一个用户发起了连接, 此时你需要对该连接创建一个套接字, 并加入到 $read 数组中;<br>当然, 并不只是服务端监听的套接字会变成可读的, 用户套接字也会变成可读的, 此时你就可以读取用户发来的数据了;<br>socket_select <code>只在套接字数组发生了变化时才返回</code>, 也就是说, 一旦执行到 socket_select 的下一条语句, 则必有一个套接字是需要你操作的</li>
+<li>stream_socket_server($local_socket, $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN) 相当于 socket_create()、socket_bind()、socket_listen()</li>
+<li>stream_socket_accept 第二个参数 <code>$timeout</code>, 设置为 <code>0</code>, 连接将立即超时, 设置为 <code>-1</code>, 无限期等待连接</li>
+<li>stream_select 与 socket_select 用法相似</li>
+</ol></div>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>Mr</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://sevming.github.io/PHP/socket.html" title="PHP Socket 服务端与客户端的通信(IO阻塞/复用)">http://sevming.github.io/PHP/socket.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/php/" rel="tag"># php</a>
+          
+            <a href="/tags/socket/" rel="tag"># socket</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/PHP/timed-task.html" rel="next" title="数据库动态配置定时任务">
+                <i class="fa fa-chevron-left"></i> 数据库动态配置定时任务
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/PHP/php-umask.html" rel="prev" title="umask">
+                umask <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.png"
+                alt="Mr" />
+            
+              <p class="site-author-name" itemprop="name">Mr</p>
+              <p class="site-description motion-element" itemprop="description">懒........</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">102</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://novnan.github.io" title="Novnan" target="_blank">Novnan</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://zhengyongshun.com" title="挨踢Blog" target="_blank">挨踢Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://25550808.github.io" title="Eagle" target="_blank">Eagle</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://luscio.github.io" title="Timber" target="_blank">Timber</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://952425340.github.io" title="谢炳南" target="_blank">谢炳南</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-6"><a class="nav-link" href="#服务端-server-php"><span class="nav-number">1.</span> <span class="nav-text">服务端 server.php</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#客户端-client-php"><span class="nav-number">2.</span> <span class="nav-text">客户端 client.php</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#测试"><span class="nav-number">3.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#IO-复用-服务端-server-php"><span class="nav-number">4.</span> <span class="nav-text">IO 复用 - 服务端 server.php</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#测试-1"><span class="nav-number">5.</span> <span class="nav-text">测试</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#服务端-server-php-1"><span class="nav-number"></span> <span class="nav-text">服务端 server.php</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#客户端-client-php-1"><span class="nav-number">1.</span> <span class="nav-text">客户端 client.php</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#IO-复用-服务端-server-php-1"><span class="nav-number">2.</span> <span class="nav-text">IO 复用 - 服务端 server.php</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mr</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.2"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#more");
+  
+  </script>
+
+
+</body>
+</html>

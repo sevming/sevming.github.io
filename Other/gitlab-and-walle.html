@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="gitlab,walle,deploy," />
+
+
+<meta name="description" content="系统 PHP版本 宿主机(A) 目标主机(B) GitLab安装目录 Walle安装目录     Centos7 5.6.37 192.168.1.20 192.168.7.20:8888 /opt/gitlab /web/www/walle-web       宿主机PHP进程用户 宿主机代码检出目录 目标主机SSH账号 目标主机SSH密码 目标主机代码的最终部署目录 目标主机代码的发布版">
+<meta name="keywords" content="gitlab,walle,deploy">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GitLab 与 Walle 部署">
+<meta property="og:url" content="http://sevming.github.io/Other/gitlab-and-walle.html">
+<meta property="og:site_name" content="Mr.Blog">
+<meta property="og:description" content="系统 PHP版本 宿主机(A) 目标主机(B) GitLab安装目录 Walle安装目录     Centos7 5.6.37 192.168.1.20 192.168.7.20:8888 /opt/gitlab /web/www/walle-web       宿主机PHP进程用户 宿主机代码检出目录 目标主机SSH账号 目标主机SSH密码 目标主机代码的最终部署目录 目标主机代码的发布版">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-07-15T04:00:35.446Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GitLab 与 Walle 部署">
+<meta name="twitter:description" content="系统 PHP版本 宿主机(A) 目标主机(B) GitLab安装目录 Walle安装目录     Centos7 5.6.37 192.168.1.20 192.168.7.20:8888 /opt/gitlab /web/www/walle-web       宿主机PHP进程用户 宿主机代码检出目录 目标主机SSH账号 目标主机SSH密码 目标主机代码的最终部署目录 目标主机代码的发布版">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Mr.Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://sevming.github.io/Other/gitlab-and-walle.html"/>
+
+
+  <title>GitLab 与 Walle 部署 | Mr.Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr.Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+  
+  
+  
+    <a href="https://github.com/sevming" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sevming.github.io/Other/gitlab-and-walle.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mr">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr.Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">GitLab 与 Walle 部署</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-12T14:42:34+00:00">2018-08-12</time>
+            
+
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Other/" itemprop="url" rel="index"><span itemprop="name">Other</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <table>
+<thead>
+<tr>
+<th>系统</th>
+<th>PHP版本</th>
+<th>宿主机(A)</th>
+<th>目标主机(B)</th>
+<th>GitLab安装目录</th>
+<th>Walle安装目录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Centos7</td>
+<td>5.6.37</td>
+<td>192.168.1.20</td>
+<td>192.168.7.20:8888</td>
+<td>/opt/gitlab</td>
+<td>/web/www/walle-web</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>宿主机PHP进程用户</th>
+<th>宿主机代码检出目录</th>
+<th>目标主机SSH账号</th>
+<th>目标主机SSH密码</th>
+<th>目标主机代码的最终部署目录</th>
+<th>目标主机代码的发布版本库</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>www</td>
+<td>/web/data/walle/symfony</td>
+<td>sevming</td>
+<td>123456789</td>
+<td>/web/www/symfony</td>
+<td>/web/www/symfony/releases</td>
+</tr>
+</tbody>
+</table>
+<p><code>ps：这里是LAMP环境, 所以PHP进程用户即Apache配置文件里指定的用户,建议目标主机SSH账号与目标主机PHP进程用户是同一个账号</code></p>
+<a id="more"></a>
+<h5 id="GitLab-安装"><a href="#GitLab-安装" class="headerlink" title="GitLab 安装"></a>GitLab 安装</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 安装依赖组件</span></span><br><span class="line">yum install -y curl policycoreutils-python openssh-server postfix</span><br><span class="line">systemctl <span class="built_in">enable</span> sshd</span><br><span class="line">systemctl start sshd</span><br><span class="line">systemctl <span class="built_in">enable</span> postfix</span><br><span class="line">systemctl start postfix</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 开启设置防火墙</span></span><br><span class="line">firewall-cmd --permanent --add-service=http</span><br><span class="line">systemctl reload firewalld</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 获取GitLab的rpm包(通过清华开源镜像站下载rpm包)</span></span><br><span class="line">wget https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el7/gitlab-ce-11.1.4-ce.0.el7.x86_64.rpm</span><br><span class="line"></span><br><span class="line"><span class="comment">#4. 安装rpm包</span></span><br><span class="line">rpm -ivh gitlab-ce-11.1.4-ce.0.el7.x86_64.rpm</span><br><span class="line"></span><br><span class="line"><span class="comment">#5. 修改gitlab配置文件指定服务器ip和自定义端口[预留8000端口]</span></span><br><span class="line">vi /etc/gitlab/gitlab.rb</span><br><span class="line">external_url <span class="string">'http://192.168.1.20:7777'</span>      <span class="comment">#访问地址</span></span><br><span class="line">firewall-cmd --add-port=7777/tcp --permanent <span class="comment">#防火墙添加开放端口</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#6. 重新配置并启动GitLab</span></span><br><span class="line">gitlab-ctl reconfigure</span><br><span class="line">gitlab-ctl restart</span><br><span class="line"></span><br><span class="line"><span class="comment">#7. 访问192.168.1.20, 默认账号为 root</span></span><br></pre></td></tr></table></figure>
+<h5 id="GitLab-卸载"><a href="#GitLab-卸载" class="headerlink" title="GitLab 卸载"></a>GitLab 卸载</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#停止GitLab</span></span><br><span class="line">gitlab-ctl stop</span><br><span class="line"><span class="comment">#卸载GitLab</span></span><br><span class="line">rpm -e gitlab-ce</span><br><span class="line"><span class="comment">#查看GitLab进程</span></span><br><span class="line">ps aux | grep gitlab</span><br><span class="line"><span class="comment">#杀掉第一个进程(有很多.............的进程)</span></span><br><span class="line"><span class="built_in">kill</span> -9 1111</span><br><span class="line"><span class="comment">#删除所有包含GitLab文件</span></span><br><span class="line">find / -name gitlab|xargs rm -rf</span><br></pre></td></tr></table></figure>
+<h5 id="GitLab-常见问题"><a href="#GitLab-常见问题" class="headerlink" title="GitLab 常见问题"></a>GitLab 常见问题</h5><ol>
+<li><p><code>502 Whoops, GitLab is taking too much time to respond</code> </p>
+<ul>
+<li>内存过小, 需要4G内存</li>
+<li>8080 端口被占用</li>
+</ul>
+</li>
+<li><p><code>gitlab-ctl reconfigure</code> 卡在 <code>ruby_block[supervise_redis_sleep] action run</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart gitlab-runsvdir</span><br><span class="line">gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>重置用户密码</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 切换目录</span></span><br><span class="line"><span class="built_in">cd</span> /opt/gitlab/bin</span><br><span class="line"><span class="comment">#2. 进入管理后台</span></span><br><span class="line">gitlab-rails console production</span><br><span class="line"><span class="comment">#3. 通过 user=User.where(id:1).first 来查找与切换账号 (User.all 查看所有用户)</span></span><br><span class="line">user=User.where(id:1)</span><br><span class="line"><span class="comment">#4. 重置密码</span></span><br><span class="line">user.password=12345678</span><br><span class="line"><span class="comment">#5. 确认密码</span></span><br><span class="line">user.password_confirmation=12345678</span><br><span class="line"><span class="comment">#6. 保存新密码</span></span><br><span class="line">user.save</span><br><span class="line"><span class="comment">#7. 退出</span></span><br><span class="line">quit</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>移除 GitLab 中的IP黑名单</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 获取哪里记录的IP黑名单(三个中总会找到gitlab连接的redis所用的socket文件)</span></span><br><span class="line">grep <span class="string">"Rack_Attack"</span> /var/<span class="built_in">log</span>/gitlab/gitlab-rails/auth.log</span><br><span class="line">grep <span class="string">"Rack_Attack"</span> /var/<span class="built_in">log</span>/gitlab/gitlab-rails/production.log</span><br><span class="line">grep unixsocket /var/opt/gitlab/redis/redis.conf</span><br><span class="line"><span class="comment">#2. 利用 redis-cli 连接</span></span><br><span class="line">redis-cli -s /var/opt/gitlab/redis/redis.socket</span><br><span class="line"><span class="comment">#3. 查看哪些被列表黑名单</span></span><br><span class="line">redis /var/opt/gitlab/redis/redis.socket&gt;keys *attack*</span><br><span class="line"><span class="string">"cache:gitlab:rack::attack:allow2ban:ban:192.168.0.143"</span></span><br><span class="line"><span class="comment">#4. 删除黑名单中的IP</span></span><br><span class="line">del cache:gitlab:rack::attack:allow2ban:ban:192.168.0.143</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h5 id="Walle-安装"><a href="#Walle-安装" class="headerlink" title="Walle 安装"></a>Walle 安装</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 代码检出</span></span><br><span class="line">mkdir -p /web/www &amp;&amp; <span class="built_in">cd</span> /web/www</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/meolu/walle-web.git</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 设置mysql连接</span></span><br><span class="line">vi config/local.php</span><br><span class="line"><span class="string">'db'</span> =&gt; [</span><br><span class="line">    <span class="string">'dsn'</span>       =&gt; <span class="string">'mysql:host=127.0.0.1;dbname=walle'</span>, <span class="comment"># 新建数据库walle</span></span><br><span class="line">    <span class="string">'username'</span>  =&gt; <span class="string">'root'</span>,                              <span class="comment"># 连接的用户名</span></span><br><span class="line">    <span class="string">'password'</span>  =&gt; <span class="string">'root'</span>,                              <span class="comment"># 连接的密码</span></span><br><span class="line">],</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 安装vendor, 若是安装太慢, 去此地址下载 https://pan.baidu.com/s/1kU6gdZD</span></span><br><span class="line">composer install</span><br><span class="line"></span><br><span class="line"><span class="comment">#4. 初始化项目</span></span><br><span class="line">./yii walle/setup</span><br><span class="line"></span><br><span class="line"><span class="comment">#5. 配置 apache vhosts, /web/server/httpd/conf/extra/httpd-vhosts.conf</span></span><br><span class="line">Listen 9002</span><br><span class="line">&lt;VirtualHost *:9002&gt;</span><br><span class="line">    DocumentRoot <span class="string">"/web/www/walle-web/web"</span></span><br><span class="line">    &lt;Directory <span class="string">"/web/www/walle-web/web"</span>&gt;</span><br><span class="line">        Options Indexes FollowSymLinks</span><br><span class="line">        AllowOverride all</span><br><span class="line">        Require all granted</span><br><span class="line">    &lt;/Directory&gt;</span><br><span class="line">&lt;/VirtualHost&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">#6. 添加开放端口</span></span><br><span class="line">firewall-cmd --add-port=9002/tcp --permanent <span class="comment">#防火墙开放端口</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#7. 访问 192.168.1.20:9002, 默认账号：admin, 密码：admin</span></span><br></pre></td></tr></table></figure>
+<h5 id="Walle-项目检测问题"><a href="#Walle-项目检测问题" class="headerlink" title="Walle 项目检测问题"></a>Walle 项目检测问题</h5><ol>
+<li><p>宿主机代码检出检测出错, 请确认php进程用户有代码存储仓库 <code>/web/data/walle/symfony</code> 读写权限</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#宿主机执行以下命令</span></span><br><span class="line">mkdir -p/web/data/walle</span><br><span class="line">chown -R www:www /web/data/walle</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>宿主机代码检出检测出错, 请确认把php进程用户的ssh-key加入git的deploy-keys列表</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#宿主机执行以下命令</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#1. GitLab的项目记得设置为 public </span></span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 切换为www用户</span></span><br><span class="line">su www</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 生成rsa key</span></span><br><span class="line">ssh-keygen -t rsa</span><br><span class="line"></span><br><span class="line"><span class="comment">#4. 查看公钥并复制</span></span><br><span class="line">cat ~/.ssh/id_rsa.pub</span><br><span class="line"></span><br><span class="line"><span class="comment">#5. 将公钥添加至GitLab -&gt; Settings -&gt; SSH Keys</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#若以上命令执行后仍然报此错误, 那应该是项目配置的 git 地址是 ssh 格式, 且宿主机内未 git clone 过项目代码, 运行命令</span></span><br><span class="line">su www</span><br><span class="line">git <span class="built_in">clone</span> git@192.168.1.20:symfony/symfony.git</span><br><span class="line"><span class="comment">#输入 yes 后回车</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>目标机器检测出错, 请确认php进程用户ssh-key加入目标机器的ming用户ssh-key信任列表(项目配置里的目标机器IP列表记得带端口)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#宿主机执行以下命令</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#1. 切换为www用户</span></span><br><span class="line">su www</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 加入目标机群信任</span></span><br><span class="line">ssh-copy-id -i ~/.ssh/id_rsa.pub -p 8888 sevming@192.168.7.20</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 目标机器需满足以下三个条件</span></span><br><span class="line">/home/sevming 755</span><br><span class="line">~/.ssh 700</span><br><span class="line">~/.ssh/authorized_keys 644 或 600</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>目标机器检测出错, 请确认ming有目标机器发布版本库/web/www/symfony写入权限</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#目标主机执行以下命令</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#1. 创建目录</span></span><br><span class="line">mkdir /web/www/symfony</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 修改目录的所有者与组</span></span><br><span class="line">chown -R sevming:sevming /web/www/symfony</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<hr>
+<h5 id="Walle2-0-部署"><a href="#Walle2-0-部署" class="headerlink" title="Walle2.0 部署"></a>Walle2.0 部署</h5><ol>
+<li><p>代码检出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /web/www &amp;&amp; <span class="built_in">cd</span> /web/www </span><br><span class="line">git <span class="built_in">clone</span> https://github.com/meolu/walle-web.git</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置虚拟主机</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">upstream webservers &#123;</span><br><span class="line">    server 0.0.0.0:5000 weight=1; <span class="comment"># 负载设置</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen       8888;</span><br><span class="line">    <span class="comment">#server_name  admin.walle-web.io; # 域名设置</span></span><br><span class="line">    access_log /web/www/logs/walle_access_nginx.log combined;</span><br><span class="line">    error_log /web/www/logs/walle_error_nginx.log crit;</span><br><span class="line">    index index.html index.htm;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        try_files <span class="variable">$uri</span> <span class="variable">$uri</span>/ /index.html;</span><br><span class="line">        add_header access-control-allow-origin *;</span><br><span class="line">        root /web/www/walle-web/fe;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location ^~ /api/ &#123;</span><br><span class="line">        add_header access-control-allow-origin *;</span><br><span class="line">        proxy_pass      http://webservers;</span><br><span class="line">        proxy_set_header X-Forwarded-Host <span class="variable">$host</span>:<span class="variable">$server_port</span>;</span><br><span class="line">        proxy_set_header  X-Real-IP  <span class="variable">$remote_addr</span>;</span><br><span class="line">        proxy_set_header    Origin        <span class="variable">$host</span>:<span class="variable">$server_port</span>;</span><br><span class="line">        proxy_set_header    Referer       <span class="variable">$host</span>:<span class="variable">$server_port</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location ^~ /socket.io/ &#123;</span><br><span class="line">        add_header access-control-allow-origin *;</span><br><span class="line">        proxy_pass      http://webservers;</span><br><span class="line">        proxy_set_header X-Forwarded-Host <span class="variable">$host</span>:<span class="variable">$server_port</span>;</span><br><span class="line">        proxy_set_header  X-Real-IP  <span class="variable">$remote_addr</span>;</span><br><span class="line">        proxy_set_header    Origin        <span class="variable">$host</span>:<span class="variable">$server_port</span>;</span><br><span class="line">        proxy_set_header    Referer       <span class="variable">$host</span>:<span class="variable">$server_port</span>;</span><br><span class="line">        proxy_set_header Host <span class="variable">$http_host</span>;</span><br><span class="line">        proxy_set_header X-NginX-Proxy <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment"># WebScoket Support</span></span><br><span class="line">        proxy_http_version 1.1;</span><br><span class="line">        proxy_set_header Upgrade <span class="variable">$http_upgrade</span>;</span><br><span class="line">        proxy_set_header Connection <span class="string">"upgrade"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装Python 2.7 + pip</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh admin.sh init</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Config setting</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">vi walle/config/settings_prod.py</span><br><span class="line"></span><br><span class="line"><span class="comment"># 服务启动 @TODO</span></span><br><span class="line"><span class="comment"># HOST 修改为与 nginx server_name 一致.</span></span><br><span class="line">HOST = <span class="string">'localhost'</span></span><br><span class="line">PORT = 5000</span><br><span class="line"></span><br><span class="line"><span class="comment"># 数据库设置</span></span><br><span class="line">SQLALCHEMY_DATABASE_URI = <span class="string">'mysql://root:root@localhost:3306/walle?charset=utf8'</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>mysql 创建数据库 walle </p>
+</li>
+<li><p>Data Migration</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh admin.sh migration</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh admin.sh start</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>开放端口</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#添加开放端口(--permanent 表示永久生效)</span></span><br><span class="line">firewall-cmd --add-port=8888/tcp --permanent</span><br><span class="line"><span class="comment">#重启服务</span></span><br><span class="line">systemctl restart firewalld</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>super - 创建空间, owner - 创建项目及部署上线</p>
+</li>
+<li><p>项目配置模板</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 目标集群部署路径 </span></span><br><span class="line">/web/www/symfony</span><br><span class="line"><span class="comment">#2. 目标集群部署仓库 </span></span><br><span class="line">/web/www/symfony/releases</span><br><span class="line"><span class="comment">#3. 高级任务-Release前置任务</span></span><br><span class="line">/bin/systemctl stop httpd</span><br><span class="line"><span class="comment">#4. 高级任务-Release后置任务</span></span><br><span class="line">cp /web/www/symfony/releases/.env /web/www/symfony/</span><br><span class="line">chown -R www:www /web/www/symfony</span><br><span class="line"><span class="comment">#修改软链指向的源文件所属组和所属用户</span></span><br><span class="line">chown -H -R www:www /web/www/symfony</span><br><span class="line">/bin/systemctl start httpd</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>服务器配置使用 root 用户</p>
+</li>
+<li><p>宿主机配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 生成rsa key</span></span><br><span class="line">ssh-keygen -t rsa</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 查看公钥并复制</span></span><br><span class="line">cat ~/.ssh/id_rsa.pub</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 将公钥添加至GitLab -&gt; Settings -&gt; SSH Keys</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#若以上命令执行后仍然报此错误, 那应该是项目配置的 git 地址是 ssh 格式, 且宿主机内未 git clone 过项目代码, 运行命令</span></span><br><span class="line">git <span class="built_in">clone</span> git@192.168.1.20:symfony/symfony.git</span><br><span class="line"><span class="comment">#输入 yes 后回车</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#4. 加入目标机群信任</span></span><br><span class="line">ssh-copy-id -i ~/.ssh/id_rsa.pub -p 8888 sevming@192.168.7.20</span><br></pre></td></tr></table></figure></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>Mr</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://sevming.github.io/Other/gitlab-and-walle.html" title="GitLab 与 Walle 部署">http://sevming.github.io/Other/gitlab-and-walle.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/gitlab/" rel="tag"># gitlab</a>
+          
+            <a href="/tags/walle/" rel="tag"># walle</a>
+          
+            <a href="/tags/deploy/" rel="tag"># deploy</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/PHP/app-interface-security.html" rel="next" title="APP 接口设计(加密/签名/TOKEN认证/接口版本)">
+                <i class="fa fa-chevron-left"></i> APP 接口设计(加密/签名/TOKEN认证/接口版本)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/Git/git-configuration.html" rel="prev" title="Git 配置">
+                Git 配置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.png"
+                alt="Mr" />
+            
+              <p class="site-author-name" itemprop="name">Mr</p>
+              <p class="site-description motion-element" itemprop="description">懒........</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">102</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://novnan.github.io" title="Novnan" target="_blank">Novnan</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://zhengyongshun.com" title="挨踢Blog" target="_blank">挨踢Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://25550808.github.io" title="Eagle" target="_blank">Eagle</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://luscio.github.io" title="Timber" target="_blank">Timber</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://952425340.github.io" title="谢炳南" target="_blank">谢炳南</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#GitLab-安装"><span class="nav-number">1.</span> <span class="nav-text">GitLab 安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#GitLab-卸载"><span class="nav-number">2.</span> <span class="nav-text">GitLab 卸载</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#GitLab-常见问题"><span class="nav-number">3.</span> <span class="nav-text">GitLab 常见问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Walle-安装"><span class="nav-number">4.</span> <span class="nav-text">Walle 安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Walle-项目检测问题"><span class="nav-number">5.</span> <span class="nav-text">Walle 项目检测问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Walle2-0-部署"><span class="nav-number">6.</span> <span class="nav-text">Walle2.0 部署</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mr</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.2"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#more");
+  
+  </script>
+
+
+</body>
+</html>

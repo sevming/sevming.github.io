@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="linux,vagrant," />
+
+
+<meta name="description" content="Vagrant 用于创建和部署虚拟化开发环境, 通过命令和配置文件来管理虚拟机.  创建共享文件夹, 用于主机和虚拟机之间进行资源共享 package进行打包分发, 避免二次重建环境, 且可以统一开发环境  VirtualBox + Vagrant 安装并启动1234567891011121314151617181920212223242526272829301. 安装 Vagrant https">
+<meta name="keywords" content="linux,vagrant">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Virtualbox + Vagrant + OneinStack 搭建虚拟开发环境">
+<meta property="og:url" content="http://sevming.github.io/Linux/virtualbox-vagrant-oneinstack.html">
+<meta property="og:site_name" content="Mr.Blog">
+<meta property="og:description" content="Vagrant 用于创建和部署虚拟化开发环境, 通过命令和配置文件来管理虚拟机.  创建共享文件夹, 用于主机和虚拟机之间进行资源共享 package进行打包分发, 避免二次重建环境, 且可以统一开发环境  VirtualBox + Vagrant 安装并启动1234567891011121314151617181920212223242526272829301. 安装 Vagrant https">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-07-15T04:00:35.443Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Virtualbox + Vagrant + OneinStack 搭建虚拟开发环境">
+<meta name="twitter:description" content="Vagrant 用于创建和部署虚拟化开发环境, 通过命令和配置文件来管理虚拟机.  创建共享文件夹, 用于主机和虚拟机之间进行资源共享 package进行打包分发, 避免二次重建环境, 且可以统一开发环境  VirtualBox + Vagrant 安装并启动1234567891011121314151617181920212223242526272829301. 安装 Vagrant https">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Mr.Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://sevming.github.io/Linux/virtualbox-vagrant-oneinstack.html"/>
+
+
+  <title>Virtualbox + Vagrant + OneinStack 搭建虚拟开发环境 | Mr.Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr.Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+  
+  
+  
+    <a href="https://github.com/sevming" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sevming.github.io/Linux/virtualbox-vagrant-oneinstack.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mr">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr.Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Virtualbox + Vagrant + OneinStack 搭建虚拟开发环境</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-24T14:20:42+00:00">2019-01-24</time>
+            
+
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <div class="note danger"><p>Vagrant 用于创建和部署虚拟化开发环境, 通过命令和配置文件来管理虚拟机.</p>
+<ul>
+<li>创建共享文件夹, 用于主机和虚拟机之间进行资源共享</li>
+<li>package进行打包分发, 避免二次重建环境, 且可以统一开发环境</li>
+</ul></div>
+<h5 id="VirtualBox-Vagrant-安装并启动"><a href="#VirtualBox-Vagrant-安装并启动" class="headerlink" title="VirtualBox + Vagrant 安装并启动"></a>VirtualBox + Vagrant 安装并启动</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">1. 安装 Vagrant https://releases.hashicorp.com/vagrant/2.2.3/vagrant_2.2.3_x86_64.msi</span><br><span class="line"></span><br><span class="line">2. 安装 Virtualbox https://download.virtualbox.org/virtualbox/6.0.2/VirtualBox-6.0.2-128162-Win.exe</span><br><span class="line"></span><br><span class="line">3. 新建 D:/centos7 目录, 并切换至此目录</span><br><span class="line">D:</span><br><span class="line"><span class="built_in">cd</span> centos7</span><br><span class="line"></span><br><span class="line">4. 添加 box 到 vagrant, 选择 virtualbox</span><br><span class="line">vagrant box add centos/7</span><br><span class="line">若下载太慢,可以中断下载,复制box下载链接并下载至D盘 https://vagrantcloud.com/centos/boxes/7/versions/1812.01/providers/virtualbox.box</span><br><span class="line">vagrant box add centos/7 D:/virtualbox.box</span><br><span class="line"></span><br><span class="line">5. 初始化目录, 生成 Vagrantfile 文件</span><br><span class="line">vagrant init centos/7</span><br><span class="line"></span><br><span class="line">6. 由于vagrant没有Guest Additions, 通过vagrant不能创建共享文件夹, 所以需要下载vbguest插件, 当启动时自动安装Guest Additions</span><br><span class="line">vagrant plugin install vagrant-vbguest</span><br><span class="line"></span><br><span class="line">7. 修改 Vagrantfile 配置文件</span><br><span class="line"><span class="comment">#启用 vagrant_data 共享目录(第二个参数不要跟vagrant同名)</span></span><br><span class="line">config.vm.synced_folder <span class="string">"D:/share"</span>, <span class="string">"/vagrant_data"</span></span><br><span class="line"><span class="comment">#配置虚拟机IP(只能主机访问)</span></span><br><span class="line">config.vm.network <span class="string">"private_network"</span>, ip: <span class="string">"192.168.1.7"</span></span><br><span class="line"></span><br><span class="line">8. 启动系统</span><br><span class="line">vagrant up</span><br><span class="line"></span><br><span class="line">9. SSH 连接</span><br><span class="line">vagrant ssh</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h5 id="Vagrant-Xshell-连接方式"><a href="#Vagrant-Xshell-连接方式" class="headerlink" title="Vagrant Xshell 连接方式"></a>Vagrant Xshell 连接方式</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#密钥登录</span></span><br><span class="line"><span class="comment">#1. 查看 HostName、User、Port、IdentityFile</span></span><br><span class="line">vagrant ssh-config</span><br><span class="line"><span class="comment">#2. 配置 xshell 的主机、端口</span></span><br><span class="line"><span class="comment">#3. 用户身份验证方法修改为 Public Key, 配置用户名 vagrant, 用户密钥选择 IdentityFile 路径指向的文件即可登录</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#密码登录</span></span><br><span class="line"><span class="comment">#1. 切换 root 账号</span></span><br><span class="line">sudo -i</span><br><span class="line"><span class="comment">#2. 设置密码</span></span><br><span class="line">passwd</span><br><span class="line"><span class="comment">#3. 修改 /etc/ssh/sshd_config, 去掉 PermitRootLogin、PasswordAuthentication 前面的 # 号, 并修改为 yes</span></span><br><span class="line">PermitRootLogin yes</span><br><span class="line">PasswordAuthentication yes</span><br><span class="line"><span class="comment">#4. 重启sshd服务</span></span><br><span class="line">systemctl restart sshd</span><br></pre></td></tr></table></figure>
+<h5 id="制作-box"><a href="#制作-box" class="headerlink" title="制作 box"></a>制作 box</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 清除 yum 缓存、删除解压后的 OneinStack</span></span><br><span class="line">yum clean all</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 切换至 D:/centos7, 然后关机</span></span><br><span class="line">vagrant halt</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 切换至 VirtualBox 安装目录下, 查看虚拟机名称</span></span><br><span class="line">vboxmanage list vms</span><br><span class="line"></span><br><span class="line"><span class="comment">#4. 打包语法：vagrant package --base 在VirtualBox显示的虚拟机名称 --output 打包后的box, 例：</span></span><br><span class="line">vagrant package --base centos7_default_1548314709374_91318 --output D:/test.box</span><br></pre></td></tr></table></figure>
+<h5 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#启动系统时提示 default: Warning: Authentication failure. Retrying...</span></span><br><span class="line"><span class="comment">#1. vagrant ssh 登录vagrant用户(默认密码vagrant),并切换到 /home/vagrant 目录</span></span><br><span class="line"><span class="built_in">cd</span> /home/vagrant</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 下载官方公钥</span></span><br><span class="line">wget https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant.pub</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 覆盖authorized_keys</span></span><br><span class="line">mv vagrant.pub /home/vagrant/.ssh/authorized_keys</span><br><span class="line"></span><br><span class="line"><span class="comment">#4. 修改authorized_keys文件权限,除了属主vagrant以外,group和其他用户都不可写</span></span><br><span class="line">chmod go-w /home/vagrant/.ssh/authorized_keys</span><br><span class="line"></span><br><span class="line"><span class="comment">#5. 退出并reload</span></span><br><span class="line"><span class="built_in">exit</span></span><br><span class="line">vagrant reload</span><br></pre></td></tr></table></figure>
+<hr>
+<h5 id="OneinStack-LAMP-环境一键搭建"><a href="#OneinStack-LAMP-环境一键搭建" class="headerlink" title="OneinStack LAMP 环境一键搭建"></a><a href="https://oneinstack.com/install/" target="_blank" rel="noopener">OneinStack</a> LAMP 环境一键搭建</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#安装wget</span></span><br><span class="line">yum install -y wget</span><br><span class="line"></span><br><span class="line"><span class="comment">#下载并安装, 访问地址 192.168.1.7</span></span><br><span class="line">wget http://mirrors.linuxeye.com/oneinstack-full.tar.gz &amp;&amp; tar xzf oneinstack-full.tar.gz &amp;&amp; ./oneinstack/install.sh --apache_option 1 --php_option 7 --phpcache_option 1 --php_extensions fileinfo,redis --db_option 2 --dbinstallmethod 1 --dbrootpwd root --redis  --iptables</span><br></pre></td></tr></table></figure>
+<h5 id="OneinStack-MySQL远程连接-需配置-private-network"><a href="#OneinStack-MySQL远程连接-需配置-private-network" class="headerlink" title="OneinStack MySQL远程连接 (需配置 private_network)"></a>OneinStack MySQL远程连接 (需配置 private_network)</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 添加iptables 3306 端口</span></span><br><span class="line">iptables -I INPUT 4 -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT</span><br><span class="line"><span class="comment">#保存iptables规则</span></span><br><span class="line">service iptables save </span><br><span class="line"><span class="comment">#查看添加的iptables规则</span></span><br><span class="line">iptables -nvL</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. MySQL 授权, 添加一个用户 vagrant(用户名不能为root), 密码为 123456, 授权为% (%表示所有IP能连接)对 test 数据库所有权限</span></span><br><span class="line">grant all privileges on <span class="built_in">test</span>.* to vagrant@<span class="string">'%'</span> identified by <span class="string">'123456'</span>;</span><br><span class="line"><span class="comment">#刷新权限立即生效</span></span><br><span class="line">flush privileges</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 主机连接</span></span><br><span class="line">Host：192.168.1.7 </span><br><span class="line">User：vagrant</span><br><span class="line">Password：123456</span><br></pre></td></tr></table></figure>
+<h5 id="OneinStack-PHP-关闭zend-opcache"><a href="#OneinStack-PHP-关闭zend-opcache" class="headerlink" title="OneinStack PHP 关闭zend opcache"></a>OneinStack PHP 关闭zend opcache</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">phpinfo() 可以看到 opcache 的配置文件路径,将以下两个参数的值修改为0</span><br><span class="line">opcache.enable=0;</span><br><span class="line">opcache_cli=0; </span><br><span class="line"></span><br><span class="line">systemctl restart php-fpm</span><br></pre></td></tr></table></figure>
+<hr>
+<h5 id="搭建-test-项目-虚拟机配置"><a href="#搭建-test-项目-虚拟机配置" class="headerlink" title="搭建 test 项目 - 虚拟机配置"></a>搭建 test 项目 - 虚拟机配置</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. OneinStack 安装后的项目目录默认为 /data/wwwroot, 在 /data/wwwroot 目录下新建 test 目录</span></span><br><span class="line"><span class="comment">#2. 在 /usr/local/apache/conf/vhost/ 目录下新建 test.conf, 代码如下：</span></span><br><span class="line">Listen 8080</span><br><span class="line">&lt;VirtualHost *:8080&gt;</span><br><span class="line">  DocumentRoot <span class="string">"/data/wwwroot/test"</span>  </span><br><span class="line">  ErrorLog <span class="string">"/data/wwwlogs/test_error_apache.log"</span></span><br><span class="line">  CustomLog <span class="string">"/data/wwwlogs/test_apache.log"</span> common</span><br><span class="line">  &lt;Files ~ (\.user.ini|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)$&gt;</span><br><span class="line">    Order allow,deny</span><br><span class="line">    Deny from all</span><br><span class="line">  &lt;/Files&gt;</span><br><span class="line">  &lt;FilesMatch \.php$&gt;</span><br><span class="line">    SetHandler <span class="string">"proxy:unix:/dev/shm/php-cgi.sock|fcgi://localhost"</span></span><br><span class="line">  &lt;/FilesMatch&gt;</span><br><span class="line">&lt;Directory <span class="string">"/data/wwwroot/test"</span>&gt;</span><br><span class="line">  SetOutputFilter DEFLATE</span><br><span class="line">  Options FollowSymLinks ExecCGI</span><br><span class="line">  Require all granted</span><br><span class="line">  AllowOverride All</span><br><span class="line">  Order allow,deny</span><br><span class="line">  Allow from all</span><br><span class="line">  DirectoryIndex index.php index.html</span><br><span class="line">&lt;/Directory&gt;</span><br><span class="line">&lt;/VirtualHost&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">#3. 重启apache</span></span><br><span class="line">systemctl restart httpd</span><br><span class="line"><span class="comment">#4. 添加iptables 8080 端口</span></span><br><span class="line">iptables -I INPUT 4 -p tcp -m state --state NEW -m tcp --dport 8080 -j ACCEPT</span><br><span class="line"><span class="comment">#5. 保存iptables规则</span></span><br><span class="line">service iptables save</span><br></pre></td></tr></table></figure>
+<h5 id="搭建-test-项目-Vagrant-配置"><a href="#搭建-test-项目-Vagrant-配置" class="headerlink" title="搭建 test 项目 - Vagrant 配置"></a>搭建 test 项目 - Vagrant 配置</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. D盘新建test目录,作为项目目录</span></span><br><span class="line"><span class="comment">#2. 配置 Vagrantfile synced_folder</span></span><br><span class="line">config.vm.synced_folder <span class="string">"D:/test/"</span>, <span class="string">"/data/wwwroot/test"</span></span><br><span class="line"><span class="comment">#3. 重启</span></span><br><span class="line">vagrant reload</span><br></pre></td></tr></table></figure>
+<h5 id="搭建-test-项目-测试"><a href="#搭建-test-项目-测试" class="headerlink" title="搭建 test 项目 - 测试"></a>搭建 test 项目 - 测试</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. D:/test 目录下新建 index.php</span></span><br><span class="line">&lt;?php</span><br><span class="line"><span class="built_in">echo</span> <span class="string">'Test'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#2. 访问 192.168.1.7:8080, 若页面出现 test, 就说明可以了</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>Mr</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://sevming.github.io/Linux/virtualbox-vagrant-oneinstack.html" title="Virtualbox + Vagrant + OneinStack 搭建虚拟开发环境">http://sevming.github.io/Linux/virtualbox-vagrant-oneinstack.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/linux/" rel="tag"># linux</a>
+          
+            <a href="/tags/vagrant/" rel="tag"># vagrant</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/MySQL/mysql-get-random-data.html" rel="next" title="MySQL 随机获取N条数据">
+                <i class="fa fa-chevron-left"></i> MySQL 随机获取N条数据
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/Other/YApi-install.html" rel="prev" title="YApi 安装">
+                YApi 安装 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.png"
+                alt="Mr" />
+            
+              <p class="site-author-name" itemprop="name">Mr</p>
+              <p class="site-description motion-element" itemprop="description">懒........</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">102</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://novnan.github.io" title="Novnan" target="_blank">Novnan</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://zhengyongshun.com" title="挨踢Blog" target="_blank">挨踢Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://25550808.github.io" title="Eagle" target="_blank">Eagle</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://luscio.github.io" title="Timber" target="_blank">Timber</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://952425340.github.io" title="谢炳南" target="_blank">谢炳南</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#VirtualBox-Vagrant-安装并启动"><span class="nav-number">1.</span> <span class="nav-text">VirtualBox + Vagrant 安装并启动</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Vagrant-Xshell-连接方式"><span class="nav-number">2.</span> <span class="nav-text">Vagrant Xshell 连接方式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#制作-box"><span class="nav-number">3.</span> <span class="nav-text">制作 box</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#问题"><span class="nav-number">4.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#OneinStack-LAMP-环境一键搭建"><span class="nav-number">5.</span> <span class="nav-text">OneinStack LAMP 环境一键搭建</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#OneinStack-MySQL远程连接-需配置-private-network"><span class="nav-number">6.</span> <span class="nav-text">OneinStack MySQL远程连接 (需配置 private_network)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#OneinStack-PHP-关闭zend-opcache"><span class="nav-number">7.</span> <span class="nav-text">OneinStack PHP 关闭zend opcache</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#搭建-test-项目-虚拟机配置"><span class="nav-number">8.</span> <span class="nav-text">搭建 test 项目 - 虚拟机配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#搭建-test-项目-Vagrant-配置"><span class="nav-number">9.</span> <span class="nav-text">搭建 test 项目 - Vagrant 配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#搭建-test-项目-测试"><span class="nav-number">10.</span> <span class="nav-text">搭建 test 项目 - 测试</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mr</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.2"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#more");
+  
+  </script>
+
+
+</body>
+</html>

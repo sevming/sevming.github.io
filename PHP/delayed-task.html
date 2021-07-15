@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="php,redis," />
+
+
+<meta name="description" content="业务场景 订单下单后,30分钟内未支付,则取消订单(类似订单自动退款|自动收货等都一样) 类似支付宝异步通知,在未收到回复前,按此频率 0|30|60|150 通知   方案一：定时任务创建定时任务,每隔一分钟查询数据库,处理超时订单  适用小项目,可参考 数据库动态配置定时任务、秒级定时任务  缺点： 时效性差,有延迟 效率差">
+<meta name="keywords" content="php,redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis 延迟任务">
+<meta property="og:url" content="http://sevming.github.io/PHP/delayed-task.html">
+<meta property="og:site_name" content="Mr.Blog">
+<meta property="og:description" content="业务场景 订单下单后,30分钟内未支付,则取消订单(类似订单自动退款|自动收货等都一样) 类似支付宝异步通知,在未收到回复前,按此频率 0|30|60|150 通知   方案一：定时任务创建定时任务,每隔一分钟查询数据库,处理超时订单  适用小项目,可参考 数据库动态配置定时任务、秒级定时任务  缺点： 时效性差,有延迟 效率差">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-07-15T04:00:35.447Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis 延迟任务">
+<meta name="twitter:description" content="业务场景 订单下单后,30分钟内未支付,则取消订单(类似订单自动退款|自动收货等都一样) 类似支付宝异步通知,在未收到回复前,按此频率 0|30|60|150 通知   方案一：定时任务创建定时任务,每隔一分钟查询数据库,处理超时订单  适用小项目,可参考 数据库动态配置定时任务、秒级定时任务  缺点： 时效性差,有延迟 效率差">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Mr.Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://sevming.github.io/PHP/delayed-task.html"/>
+
+
+  <title>Redis 延迟任务 | Mr.Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr.Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+  
+  
+  
+    <a href="https://github.com/sevming" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sevming.github.io/PHP/delayed-task.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mr">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr.Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Redis 延迟任务</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-18T09:17:29+00:00">2019-01-18</time>
+            
+
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/PHP/" itemprop="url" rel="index"><span itemprop="name">PHP</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h5 id="业务场景"><a href="#业务场景" class="headerlink" title="业务场景"></a>业务场景</h5><div class="note info"><ol>
+<li>订单下单后,30分钟内未支付,则取消订单(类似订单自动退款|自动收货等都一样)</li>
+<li>类似支付宝异步通知,在未收到回复前,按此频率 0|30|60|150 通知</li>
+</ol></div>
+<hr>
+<h5 id="方案一：定时任务"><a href="#方案一：定时任务" class="headerlink" title="方案一：定时任务"></a>方案一：定时任务</h5><div class="note danger"><p>创建定时任务,每隔一分钟查询数据库,处理超时订单</p>
+<ol>
+<li>适用小项目,可参考 <a href="/PHP/timed-task.html">数据库动态配置定时任务</a>、<a href="/Linux/crontab.html">秒级定时任务</a> </li>
+<li>缺点：<ul>
+<li>时效性差,有延迟</li>
+<li>效率差 </li>
+</ul>
+</li>
+</ol></div>
+<a id="more"></a>
+<h5 id="方案二：redis-psubscribe"><a href="#方案二：redis-psubscribe" class="headerlink" title="方案二：redis psubscribe"></a>方案二：redis psubscribe</h5><div class="note danger"><p>订阅过期事件</p></div>
+<blockquote>
+<p>配置redis.conf<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># K    键空间通知,以__keyspace@&lt;db&gt;__为前缀  </span></span><br><span class="line"><span class="comment"># E    键事件通知,以__keysevent@&lt;db&gt;__为前缀  </span></span><br><span class="line"><span class="comment"># g    del, expipre, rename 等类型无关的通用命令的通知...  </span></span><br><span class="line"><span class="comment"># $    String命令  </span></span><br><span class="line"><span class="comment"># l    List命令  </span></span><br><span class="line"><span class="comment"># s    Set命令  </span></span><br><span class="line"><span class="comment"># h    Hash命令  </span></span><br><span class="line"><span class="comment"># z    有序集合命令  </span></span><br><span class="line"><span class="comment"># x    过期事件(每次key过期时生成)</span></span><br><span class="line"><span class="comment"># e    驱逐事件(（)当key在内存满了被清除时生成)</span></span><br><span class="line"><span class="comment"># A    g$lshzxe的别名,因此"AKE"意味着所有的事件</span></span><br><span class="line">notify-keyspace-events <span class="string">"Ex"</span></span><br></pre></td></tr></table></figure></p>
+<p>代码实现<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$redis = <span class="keyword">new</span> Redis();</span><br><span class="line">$redis-&gt;connect(<span class="string">'127.0.0.1'</span>, <span class="number">6379</span>);</span><br><span class="line">$redis-&gt;auth(<span class="string">'123456'</span>) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">"redis password verification failed"</span>);</span><br><span class="line">$redis-&gt;ping() == <span class="string">'+PONG'</span> <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">"redis connection is not available, ping=&#123;$redis-&gt;ping()&#125;"</span>);</span><br><span class="line"></span><br><span class="line">$orderList = [];</span><br><span class="line"><span class="keyword">for</span> ($i = <span class="number">1</span>; $i &lt; <span class="number">10</span>; $i++) &#123;</span><br><span class="line">    $orderKey = <span class="string">'order_'</span> . $i;</span><br><span class="line">    $rand = mt_rand(<span class="number">1</span>, <span class="number">30</span>);</span><br><span class="line">    $redis-&gt;setex($orderKey, $rand, $i);</span><br><span class="line">    $orderList[$rand] = $orderKey;</span><br><span class="line">&#125;</span><br><span class="line">ksort($orderList);</span><br><span class="line">var_export($orderList);</span><br><span class="line"></span><br><span class="line">$redis-&gt;setOption(Redis::OPT_READ_TIMEOUT, <span class="number">-1</span>);</span><br><span class="line">$redis-&gt;psubscribe([<span class="string">'__keyevent@0__:expired'</span>], <span class="function"><span class="keyword">function</span> <span class="params">($redis, $pattern, $chan, $msg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">echo</span> PHP_EOL . date(<span class="string">'Y-m-d H:i:s'</span>) . <span class="string">" &#123;$msg&#125;"</span>;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h5 id="方案三：redis-psubscribe-queue"><a href="#方案三：redis-psubscribe-queue" class="headerlink" title="方案三：redis psubscribe + queue"></a>方案三：redis psubscribe + queue</h5><div class="note danger"><p>例：A、B、C 三台服务器<br><span class="label danger">A</span> 订阅过期事件,将过期的订单 <span class="label success">rpush</span> 到 <span class="label success">queue</span>  里, <span class="label danger">B</span> 和 <span class="label danger">C</span> 通过 <span class="label success">blpop</span> 从队列获取订单处理</p></div>
+<blockquote>
+<p>A服务器订阅过期事件<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getRedis</span><span class="params">(bool $reset = false)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!$reset) &#123;</span><br><span class="line">        <span class="keyword">static</span> $redis;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    $redis = <span class="keyword">new</span> Redis();</span><br><span class="line">    $redis-&gt;connect(<span class="string">'127.0.0.1'</span>, <span class="number">6379</span>);</span><br><span class="line">    $redis-&gt;auth(<span class="string">'123456'</span>) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">"redis password verification failed"</span>);</span><br><span class="line">    $redis-&gt;ping() == <span class="string">'+PONG'</span> <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">"redis connection is not available, ping=&#123;$redis-&gt;ping()&#125;"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> $redis;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$redis = getRedis(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">$orderList = [];</span><br><span class="line"><span class="keyword">for</span> ($i = <span class="number">1</span>; $i &lt; <span class="number">10</span>; $i++) &#123;</span><br><span class="line">    $orderKey = <span class="string">'order_'</span> . $i;</span><br><span class="line">    $rand = mt_rand(<span class="number">1</span>, <span class="number">30</span>);</span><br><span class="line">    $redis-&gt;setex($orderKey, $rand, $i);</span><br><span class="line">    $orderList[$rand] = $orderKey;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$redis-&gt;setOption(Redis::OPT_READ_TIMEOUT, <span class="number">-1</span>);</span><br><span class="line"><span class="comment">// 一旦客户端进入订阅状态,客户端就只可接受订阅相关的命令SUBSCRIBE、PSUBSCRIBE、UNSUBSCRIBE、PUNSUBSCRIBE,其他命令一律失效</span></span><br><span class="line"><span class="comment">// http://www.redis.cn/commands/subscribe.html</span></span><br><span class="line">$redis-&gt;psubscribe([<span class="string">'__keyevent@0__:expired'</span>], <span class="function"><span class="keyword">function</span> <span class="params">($redis, $pattern, $chan, $msg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">echo</span> PHP_EOL . date(<span class="string">'Y-m-d H:i:s'</span>) . <span class="string">" &#123;$msg&#125;"</span>;</span><br><span class="line"></span><br><span class="line">    $r = getRedis();</span><br><span class="line">    $listKey = <span class="string">'order_list'</span>;</span><br><span class="line">    $r-&gt;rPush($listKey, $msg);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>B、C服务器处理队列<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$redis = <span class="keyword">new</span> Redis();</span><br><span class="line">$redis-&gt;connect(<span class="string">'127.0.0.1'</span>, <span class="number">6379</span>);</span><br><span class="line">$redis-&gt;auth(<span class="string">'123456'</span>) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">"redis password verification failed"</span>);</span><br><span class="line">$redis-&gt;ping() == <span class="string">'+PONG'</span> <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">"redis connection is not available, ping=&#123;$redis-&gt;ping()&#125;"</span>);</span><br><span class="line"></span><br><span class="line">$redis-&gt;setOption(Redis::OPT_READ_TIMEOUT, <span class="number">-1</span>);</span><br><span class="line"><span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">    $data = $redis-&gt;blPop(<span class="string">'order_list'</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"pid："</span> . posix_getpid() . <span class="string">", order_id：&#123;$data['1']&#125;"</span> . PHP_EOL;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h5 id="方案四：延迟任务-DelayedTask"><a href="#方案四：延迟任务-DelayedTask" class="headerlink" title="方案四：延迟任务 DelayedTask"></a>方案四：延迟任务 DelayedTask</h5><div class="note danger"><p>项目地址 <a href="https://github.com/sevming/DelayedTask" target="_blank" rel="noopener">Delayed-task</a><br>基于 Redis 的 Sorted Set 实现延迟任务<br>环境要求：</p>
+<ul>
+<li>Redis</li>
+<li>PHP &gt;=7.0.0</li>
+<li>PHP 需安装 pctnl、posix、redis 模块</li>
+</ul></div>
+<blockquote>
+<p>整体结构<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. Task Pool 存放所有任务的信息(Redis Hashes)</span><br><span class="line">2. Delay Bucket 存放所有需要延迟的任务ID,以时间戳排序(Redis Sorted Set),以取模的方式将延迟任务分配至多个Bucket</span><br><span class="line">3. 创建多个进程,负责扫描各自的Delay Bucket(取模方式),获取delayTime(延迟执行时间)小于等于当前时间的任务,从Delay Bucket中删除并放入Ready Queue(Redis Lists),按任务优先级存入不同的队列</span><br><span class="line">4. 创建多个进程,负责扫描各自的Ready Queue(先处理优先级高的队列)</span><br></pre></td></tr></table></figure></p>
+<p>流程<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">1. TaskClient-&gt;add() 客户端添加任务</span><br><span class="line">    1.1 初始化任务</span><br><span class="line">        1.1.1 topic 任务类型</span><br><span class="line">        1.1.2 id 任务ID, topic</span><br><span class="line">        1.1.3 url、call 设置一个即可,表示通知URL或call指定方法</span><br><span class="line">        1.1.4 callback 任务执行成功后的回调函数</span><br><span class="line">        1.1.5 任务调用规则</span><br><span class="line">            1.1.5.1 intervalTime = 3, persistent = <span class="literal">true</span> 每隔3秒调用一次</span><br><span class="line">            1.1.5.2 intervalTime = 10, persistent = <span class="literal">false</span> 10秒后调用一次就结束任务</span><br><span class="line">            1.1.5.3 intervalTime = <span class="string">'0,30,60'</span>, persistent = <span class="literal">true</span> 0|30|60 秒后调用任务,第三次调用任务后,之后每隔60秒调用一次</span><br><span class="line">            1.1.5.4 intervalTime = <span class="string">'0,30,60'</span>, persistent = <span class="literal">false</span> 0|30|60 秒后调用任务,第三次调用后结束任务</span><br><span class="line">        1.1.6 priority 任务优先级,不同优先级处理的任务数量也不同,目前支持设置优先级1-3,数字越高优先级越高,优先处理的任务也就越多</span><br><span class="line">        1.1.7 params 额外参数</span><br><span class="line">        1.1.8 status 任务状态,默认为延迟中</span><br><span class="line">    1.2 hSet 保存任务至 Task Pool</span><br><span class="line">    1.3 zAdd 保存任务ID,任务延迟执行时间作为排序值,bucketKey 通过 crc32(topic) % bucketCount 取模,得到任务ID所要保存在哪个Bucket中,便于多进程时的进程一对一监控</span><br><span class="line">2. TaskServer-&gt;scanBucket() 服务端扫描延迟任务</span><br><span class="line">    2.1 创建子进程,通过取模获取当前进程所需要监控的Bucket</span><br><span class="line">    2.2 通过 zRangeByScore 获取delayTime小于等于当前时间的任务</span><br><span class="line">        2.2.1 任务状态为延迟中,则将任务从Bucket中删除,并根据任务优先级添加至不同的队列(这里采用分布式锁,保证原子性)</span><br><span class="line">        2.2.2 任务状态不为延迟中,将任务从Bucket中删除</span><br><span class="line">3. TaskServer-&gt;scanQueue() 服务端扫描队列</span><br><span class="line">    3.1 创建子进程,先处理优先级较高的队列</span><br><span class="line">    3.2 通过 lPop 获取任务,再次检测一下任务状态及delayTime</span><br><span class="line">    3.3 handleTask 处理任务</span><br><span class="line">        3.3.1 OK 调用 callback</span><br><span class="line">        3.3.2 FAIL 不处理</span><br><span class="line">        3.3.3 DELAY 重新计算任务下次执行时间,将任务放入Bucket</span><br></pre></td></tr></table></figure></p>
+<p>参考：</p>
+<ol>
+<li><a href="https://tech.youzan.com/queuing_delay" target="_blank" rel="noopener">有赞延迟队列设计</a></li>
+<li><a href="https://github.com/chenlinzhong/php-delayqueue" target="_blank" rel="noopener">chenlinzhong/php-delayqueue</a></li>
+<li><a href="https://www.cnblogs.com/peachyy/p/7398430.html" target="_blank" rel="noopener">基于redis的延迟消息队列设计</a></li>
+</ol>
+</blockquote>
+<div class="note warning"><p>注意：涉及延迟任务的处理的只有 TaskServer.php 的 scanBucket、scanQueue、handleTask 方法, 其它方法的作用参考 <a href="/PHP/task-scheduling.html">任务调度</a> </p></div> 
+<blockquote>
+<p>启动、停止服务 server.php<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 启动：php server.php</span></span><br><span class="line"><span class="comment">// 停止：php server.php stop</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">use</span> <span class="title">Sevming</span>\<span class="title">DelayedTask</span>\<span class="title">TaskServer</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="string">'vendor/autoload.php'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    $server = <span class="keyword">new</span> TaskServer(<span class="string">'127.0.0.1'</span>, <span class="number">6379</span>, <span class="string">'123456'</span>);</span><br><span class="line">    $server-&gt;debug = <span class="keyword">true</span>;</span><br><span class="line">    $server-&gt;runAll();</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="keyword">Exception</span> $e) &#123;</span><br><span class="line">    <span class="keyword">exit</span>($e-&gt;getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>添加、删除任务 client.php<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">use</span> <span class="title">Sevming</span>\<span class="title">DelayedTask</span>\<span class="title">TaskClient</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="string">'vendor/autoload.php'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    $client = <span class="keyword">new</span> TaskClient(<span class="string">'127.0.0.1'</span>, <span class="number">6379</span>, <span class="string">'123456'</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. 每隔3秒调用一次Order类的return方法</span></span><br><span class="line">    $client-&gt;add([</span><br><span class="line">        <span class="string">'topic'</span> =&gt; <span class="string">'order:return'</span>,</span><br><span class="line">        <span class="string">'id'</span> =&gt; <span class="number">1</span>,</span><br><span class="line">        <span class="string">'call'</span> =&gt; [<span class="string">'Order'</span>, <span class="string">'return'</span>],</span><br><span class="line">        <span class="string">'intervalTime'</span> =&gt; <span class="number">3</span>,</span><br><span class="line">        <span class="string">'callback'</span> =&gt; [<span class="string">'Order'</span>, <span class="string">'success'</span>],</span><br><span class="line">    ]);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 10秒后调用Order类的receipt方法,仅调用1次</span></span><br><span class="line">    $client-&gt;add([</span><br><span class="line">        <span class="string">'topic'</span> =&gt; <span class="string">'order:receipt'</span>,</span><br><span class="line">        <span class="string">'id'</span> =&gt; <span class="number">2</span>,</span><br><span class="line">        <span class="string">'call'</span> =&gt; [<span class="string">'Order'</span>, <span class="string">'receipt'</span>],</span><br><span class="line">        <span class="string">'intervalTime'</span> =&gt; <span class="number">10</span>,</span><br><span class="line">        <span class="string">'persistent'</span> =&gt; <span class="keyword">false</span>,</span><br><span class="line">    ]);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 设置优先级,每隔 0|30|60秒 调用一次Order类的timeout,调用三次后结束调用</span></span><br><span class="line">    $client-&gt;add([</span><br><span class="line">        <span class="string">'topic'</span> =&gt; <span class="string">'order:timeout'</span>,</span><br><span class="line">        <span class="string">'id'</span> =&gt; <span class="number">3</span>,</span><br><span class="line">        <span class="string">'call'</span> =&gt; [<span class="string">'Order'</span>, <span class="string">'timeout'</span>],</span><br><span class="line">        <span class="string">'priority'</span> =&gt; <span class="number">2</span>,</span><br><span class="line">        <span class="string">'intervalTime'</span> =&gt; <span class="string">'0,30,60'</span>,</span><br><span class="line">        <span class="string">'persistent'</span> =&gt; <span class="keyword">false</span>,</span><br><span class="line">    ]);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 每隔 0|10|20秒 调用一次Order类的refund,调用三次后,间隔时间为20秒调用一次</span></span><br><span class="line">    $client-&gt;add([</span><br><span class="line">        <span class="string">'topic'</span> =&gt; <span class="string">'order:refund'</span>,</span><br><span class="line">        <span class="string">'id'</span> =&gt; <span class="number">4</span>,</span><br><span class="line">        <span class="string">'call'</span> =&gt; [<span class="string">'Order'</span>, <span class="string">'refund'</span>],</span><br><span class="line">        <span class="string">'intervalTime'</span> =&gt; <span class="string">'0,10,20'</span>,</span><br><span class="line">    ]);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 5. 每隔 0|15|30秒 请求一次url,请求三次后,不再请求</span></span><br><span class="line">    $client-&gt;add([</span><br><span class="line">        <span class="string">'topic'</span> =&gt; <span class="string">'order:notify'</span>,</span><br><span class="line">        <span class="string">'id'</span> =&gt; <span class="number">5</span>,</span><br><span class="line">        <span class="string">'url'</span> =&gt; <span class="string">'192.168.50.77:8080'</span>,</span><br><span class="line">        <span class="string">'params'</span> =&gt; [</span><br><span class="line">            <span class="string">'content'</span> =&gt; <span class="string">'hello'</span></span><br><span class="line">        ],</span><br><span class="line">        <span class="string">'intervalTime'</span> =&gt; <span class="string">'0,15,30'</span>,</span><br><span class="line">        <span class="string">'persistent'</span> =&gt; <span class="keyword">false</span>,</span><br><span class="line">    ]);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 6. 删除任务,根据添加任务时的topic和id</span></span><br><span class="line">    <span class="comment">//$client-&gt;del('order:return', 1);</span></span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="keyword">Exception</span> $e) &#123;</span><br><span class="line">    <span class="keyword">exit</span>($e-&gt;getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Order.php<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Order</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">return</span><span class="params">(array $task)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="keyword">__FUNCTION__</span> . <span class="string">",id=&#123;$task['id']&#125;,createTime=&#123;$task['createTime']&#125;,count=&#123;$task['rule']['count']&#125;,runTime="</span>  . date(<span class="string">'Y-m-d H:i:s'</span>) . PHP_EOL;</span><br><span class="line">        <span class="comment">// 返回success,则任务结束</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'success'</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">receipt</span><span class="params">(array $task)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="keyword">__FUNCTION__</span> . <span class="string">",id=&#123;$task['id']&#125;,createTime=&#123;$task['createTime']&#125;,count=&#123;$task['rule']['count']&#125;,runTime="</span> . date(<span class="string">'Y-m-d H:i:s'</span>) . PHP_EOL;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">timeout</span><span class="params">(array $task)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="keyword">__FUNCTION__</span> . <span class="string">",id=&#123;$task['id']&#125;,createTime=&#123;$task['createTime']&#125;,count=&#123;$task['rule']['count']&#125;,runTime="</span> . date(<span class="string">'Y-m-d H:i:s'</span>) . PHP_EOL;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">refund</span><span class="params">(array $task)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="keyword">__FUNCTION__</span> . <span class="string">",id=&#123;$task['id']&#125;,createTime=&#123;$task['createTime']&#125;,count=&#123;$task['rule']['count']&#125;,runTime="</span> . date(<span class="string">'Y-m-d H:i:s'</span>) . PHP_EOL;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">success</span><span class="params">(array $task)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        var_dump($task);</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"任务处理成功\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>TaskClient.php<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Sevming</span>\<span class="title">DelayedTask</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Exception</span>, <span class="title">RedisException</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskClient</span> <span class="keyword">extends</span> <span class="title">DelayedTask</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Add task.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> array $params</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception|RedisException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">add</span><span class="params">(array $params)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $task = <span class="keyword">$this</span>-&gt;initTask($params);</span><br><span class="line">        $redis = <span class="keyword">$this</span>-&gt;getRedisInstance();</span><br><span class="line"></span><br><span class="line">        $taskKey = <span class="keyword">$this</span>-&gt;getTaskKey($task[<span class="string">'topic'</span>], $task[<span class="string">'id'</span>]);</span><br><span class="line">        <span class="comment">// Save task to task pool.</span></span><br><span class="line">        $redis-&gt;hSet(<span class="keyword">$this</span>-&gt;getTaskPoolKey(), $taskKey, json_encode($task));</span><br><span class="line">        <span class="comment">// Save the task ID, with the task delay execution time as the sort value</span></span><br><span class="line">        $redis-&gt;zAdd(<span class="keyword">$this</span>-&gt;getBucketKey($task[<span class="string">'topic'</span>]), $task[<span class="string">'delayTime'</span>], $taskKey);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Del task.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> string $topic</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> mixed  $id</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> bool   $softDelete</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> void</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception|RedisException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">del</span><span class="params">(string $topic, $id, bool $softDelete = true)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $taskKey = <span class="keyword">$this</span>-&gt;getTaskKey($topic, $id);</span><br><span class="line">        $redis = <span class="keyword">$this</span>-&gt;getRedisInstance();</span><br><span class="line"></span><br><span class="line">        $taskPoolKey = <span class="keyword">$this</span>-&gt;getTaskPoolKey();</span><br><span class="line">        <span class="keyword">if</span> ($task = $redis-&gt;hGet($taskPoolKey, $taskKey)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!$softDelete) &#123;</span><br><span class="line">                $redis-&gt;hDel($taskPoolKey, $taskKey);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            $task = json_decode($task, <span class="keyword">true</span>);</span><br><span class="line">            <span class="keyword">if</span> ($task[<span class="string">'status'</span>] !== <span class="keyword">static</span>::TASK_STATUS_DELETED) &#123;</span><br><span class="line">                $task[<span class="string">'status'</span>] = <span class="keyword">static</span>::TASK_STATUS_DELETED;</span><br><span class="line">                $redis-&gt;hSet($taskPoolKey, $taskKey, json_encode($task));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Init task.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> array $params</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> array</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">initTask</span><span class="params">(array $params)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">empty</span>($params[<span class="string">'topic'</span>])) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="keyword">Exception</span>(<span class="string">'topic can not be empty.'</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">empty</span>($params[<span class="string">'id'</span>])) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="keyword">Exception</span>(<span class="string">'id can not be empty.'</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">empty</span>($params[<span class="string">'url'</span>]) &amp;&amp; <span class="keyword">empty</span>($params[<span class="string">'call'</span>])) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="keyword">Exception</span>(<span class="string">'url or call can not be empty.'</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">empty</span>($params[<span class="string">'call'</span>])) &#123;</span><br><span class="line">            <span class="keyword">list</span> ($class, $action) = $params[<span class="string">'call'</span>];</span><br><span class="line">            <span class="keyword">if</span> (!class_exists($class) || !method_exists($class, $action)) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="keyword">Exception</span>(<span class="string">"call class &#123;$class&#125; not exists or action &#123;$action&#125; not exists."</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">empty</span>($params[<span class="string">'callback'</span>])) &#123;</span><br><span class="line">            <span class="keyword">list</span> ($class, $action) = $params[<span class="string">'callback'</span>];</span><br><span class="line">            <span class="keyword">if</span> (!class_exists($class) || !method_exists($class, $action)) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="keyword">Exception</span>(<span class="string">"callback class &#123;$class&#125; not exists or action &#123;$action&#125; not exists."</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $intervalTimeArray = [<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">empty</span>($params[<span class="string">'intervalTime'</span>])) &#123;</span><br><span class="line">            $intervalTimeArray = explode(<span class="string">','</span>, $params[<span class="string">'intervalTime'</span>]);</span><br><span class="line">            <span class="keyword">foreach</span> ($intervalTimeArray <span class="keyword">as</span> $interval) &#123;</span><br><span class="line">                <span class="keyword">if</span> (!ctype_digit((string)$interval)) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="keyword">Exception</span>(<span class="string">"intervalTime incorrect format"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $priority = <span class="keyword">static</span>::QUEUE_PRIORITY_1;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">isset</span>($params[<span class="string">'priority'</span>]) &amp;&amp; in_array($params[<span class="string">'priority'</span>], array_keys(<span class="keyword">$this</span>-&gt;queueTaskPriority))) &#123;</span><br><span class="line">            $priority = $params[<span class="string">'priority'</span>];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $time = time();</span><br><span class="line">        $task = [</span><br><span class="line">            <span class="string">'topic'</span> =&gt; $params[<span class="string">'topic'</span>],</span><br><span class="line">            <span class="string">'id'</span> =&gt; $params[<span class="string">'id'</span>],</span><br><span class="line">            <span class="string">'priority'</span> =&gt; $priority,</span><br><span class="line">            <span class="string">'status'</span> =&gt; <span class="keyword">static</span>::TASK_STATUS_DELAY,</span><br><span class="line">            <span class="string">'url'</span> =&gt; $params[<span class="string">'url'</span>] ?? <span class="string">''</span>,</span><br><span class="line">            <span class="string">'method'</span> =&gt; $params[<span class="string">'method'</span>] ?? <span class="string">'GET'</span>,</span><br><span class="line">            <span class="string">'call'</span> =&gt; $params[<span class="string">'call'</span>] ?? [],</span><br><span class="line">            <span class="string">'params'</span> =&gt; $params[<span class="string">'params'</span>] ?? [],</span><br><span class="line">            <span class="string">'callback'</span> =&gt; $params[<span class="string">'callback'</span>] ?? [],</span><br><span class="line">            <span class="string">'rule'</span> =&gt; [</span><br><span class="line">                <span class="string">'interval'</span> =&gt; $intervalTimeArray,</span><br><span class="line">                <span class="string">'count'</span> =&gt; <span class="number">0</span>,</span><br><span class="line">                <span class="string">'persistent'</span> =&gt; <span class="keyword">isset</span>($params[<span class="string">'persistent'</span>]) ? (bool)($params[<span class="string">'persistent'</span>]) : <span class="keyword">true</span>,</span><br><span class="line">            ],</span><br><span class="line">            <span class="string">'delayTime'</span> =&gt; $params[<span class="string">'delayTime'</span>] ?? ($time + $intervalTimeArray[<span class="number">0</span>]),</span><br><span class="line">            <span class="string">'lastRunTime'</span> =&gt; <span class="string">''</span>,</span><br><span class="line">            <span class="string">'createTime'</span> =&gt; date(<span class="string">'Y-m-d H:i:s'</span>, $time),</span><br><span class="line">        ];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> $task;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>TaskServer.php<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br><span class="line">488</span><br><span class="line">489</span><br><span class="line">490</span><br><span class="line">491</span><br><span class="line">492</span><br><span class="line">493</span><br><span class="line">494</span><br><span class="line">495</span><br><span class="line">496</span><br><span class="line">497</span><br><span class="line">498</span><br><span class="line">499</span><br><span class="line">500</span><br><span class="line">501</span><br><span class="line">502</span><br><span class="line">503</span><br><span class="line">504</span><br><span class="line">505</span><br><span class="line">506</span><br><span class="line">507</span><br><span class="line">508</span><br><span class="line">509</span><br><span class="line">510</span><br><span class="line">511</span><br><span class="line">512</span><br><span class="line">513</span><br><span class="line">514</span><br><span class="line">515</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Sevming</span>\<span class="title">DelayedTask</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Exception</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">Sevming</span>\<span class="title">DelayedTask</span>\<span class="title">Traits</span>\<span class="title">HttpTrait</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TaskServer</span> <span class="keyword">extends</span> <span class="title">DelayedTask</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">use</span> <span class="title">HttpTrait</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Log file.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> string</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> $logFile = <span class="string">''</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The file to store master process PID.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> string</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> $pidFile = <span class="string">''</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Debug mode.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> bool</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> $debug = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The PID of master process.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> int</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> $masterPid = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The PID Map of bucket process.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> array</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> $bucketPidMap = [];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The PID Map of queue process.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> array</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> $queuePidMap = [];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Run all.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">runAll</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;checkEnv();</span><br><span class="line">        <span class="keyword">$this</span>-&gt;init();</span><br><span class="line">        <span class="keyword">$this</span>-&gt;parseCommand();</span><br><span class="line">        <span class="keyword">$this</span>-&gt;daemonize();</span><br><span class="line">        <span class="keyword">$this</span>-&gt;installSignal();</span><br><span class="line">        <span class="keyword">$this</span>-&gt;saveMasterPid();</span><br><span class="line">        <span class="keyword">$this</span>-&gt;scanBucket();</span><br><span class="line">        <span class="keyword">$this</span>-&gt;scanQueue();</span><br><span class="line">        <span class="keyword">$this</span>-&gt;resetStd();</span><br><span class="line">        <span class="keyword">$this</span>-&gt;monitorProcess();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Check env.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">checkEnv</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// Only for cli</span></span><br><span class="line">        <span class="keyword">if</span> (php_sapi_name() != <span class="string">'cli'</span>) &#123;</span><br><span class="line">            <span class="keyword">exit</span>(<span class="string">"only run in command line mode.\n"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Only for linux</span></span><br><span class="line">        <span class="keyword">if</span> (strpos(strtolower(PHP_OS), <span class="string">'win'</span>) === <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">exit</span>(<span class="string">"Not support windows.\n"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Need pcntl extension</span></span><br><span class="line">        <span class="keyword">if</span> (!extension_loaded(<span class="string">'pcntl'</span>)) &#123;</span><br><span class="line">            <span class="keyword">exit</span>(<span class="string">"Please install pcntl extension.\n"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Need posix extension</span></span><br><span class="line">        <span class="keyword">if</span> (!extension_loaded(<span class="string">'posix'</span>)) &#123;</span><br><span class="line">            <span class="keyword">exit</span>(<span class="string">"Please install posix extension.\n"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Need redis extension</span></span><br><span class="line">        <span class="keyword">if</span> (!extension_loaded(<span class="string">'redis'</span>)) &#123;</span><br><span class="line">            <span class="keyword">exit</span>(<span class="string">"Please install redis extension.\n"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Init.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">init</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $backtrace = debug_backtrace();</span><br><span class="line">        $startFile = $backtrace[count($backtrace) - <span class="number">1</span>][<span class="string">'file'</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">empty</span>(<span class="keyword">$this</span>-&gt;pidFile)) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;pidFile = <span class="keyword">__DIR__</span> . <span class="string">'/'</span> . str_replace(<span class="string">'/'</span>, <span class="string">'_'</span>, $startFile) . <span class="string">'.pid'</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">empty</span>(<span class="keyword">$this</span>-&gt;logFile)) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;logFile = <span class="keyword">__DIR__</span> . <span class="string">'/TaskServer.log'</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">$this</span>-&gt;logFile = (string)<span class="keyword">$this</span>-&gt;logFile;</span><br><span class="line">        <span class="keyword">if</span> (!is_file(<span class="keyword">$this</span>-&gt;logFile)) &#123;</span><br><span class="line">            touch(<span class="keyword">$this</span>-&gt;logFile);</span><br><span class="line">            chmod(<span class="keyword">$this</span>-&gt;logFile, <span class="number">0622</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">$this</span>-&gt;setProcessTitle(<span class="string">'master'</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Parse command.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">parseCommand</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">global</span> $argv;</span><br><span class="line"></span><br><span class="line">        $availableCommands = [<span class="string">'start'</span>, <span class="string">'stop'</span>];</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">isset</span>($argv[<span class="number">1</span>]) || !in_array($argv[<span class="number">1</span>], $availableCommands)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">isset</span>($argv[<span class="number">1</span>])) &#123;</span><br><span class="line">                <span class="keyword">exit</span>(<span class="string">"Unknown command: &#123;$argv[1]&#125;\n"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $command = <span class="keyword">isset</span>($argv[<span class="number">1</span>]) ? trim($argv[<span class="number">1</span>]) : <span class="string">''</span>;</span><br><span class="line">        <span class="comment">// Avoid repeated run</span></span><br><span class="line">        $masterPid = is_file(<span class="keyword">$this</span>-&gt;pidFile) ? file_get_contents(<span class="keyword">$this</span>-&gt;pidFile) : <span class="number">0</span>;</span><br><span class="line">        $masterIsAlive = $masterPid &amp;&amp; posix_kill($masterPid, <span class="number">0</span>) &amp;&amp; posix_getpid() != $masterPid;</span><br><span class="line">        <span class="keyword">if</span> ($masterIsAlive &amp;&amp; $command === <span class="string">'start'</span>) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;log(<span class="string">'already running'</span>);</span><br><span class="line">            <span class="keyword">exit</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($command) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'stop'</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;log(<span class="string">'process is stopping ...'</span>);</span><br><span class="line">                <span class="comment">// Send stop signal to master process.</span></span><br><span class="line">                $masterPid &amp;&amp; posix_kill($masterPid, SIGINT);</span><br><span class="line">                $timeout = <span class="number">5</span>;</span><br><span class="line">                $startTime = time();</span><br><span class="line">                <span class="comment">// Check master process is still alive?</span></span><br><span class="line">                <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">                    $masterIsAlive = $masterPid &amp;&amp; posix_kill($masterPid, <span class="number">0</span>);</span><br><span class="line">                    <span class="keyword">if</span> ($masterIsAlive) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (time() - $startTime &gt;= $timeout) &#123;</span><br><span class="line">                            <span class="keyword">$this</span>-&gt;log(<span class="string">'process stop fail.'</span>);</span><br><span class="line">                            <span class="keyword">exit</span>;</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        usleep(<span class="number">10000</span>);</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">$this</span>-&gt;log(<span class="string">'process stop success.'</span>);</span><br><span class="line">                    <span class="keyword">exit</span>(<span class="number">0</span>);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Run as deamon mode.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">daemonize</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;debug) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $pid = pcntl_fork();</span><br><span class="line">        <span class="keyword">if</span> ($pid === <span class="number">-1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="keyword">Exception</span>(<span class="string">'fork fail'</span>);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> ($pid &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">exit</span>(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (posix_setsid() === <span class="number">-1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="keyword">Exception</span>(<span class="string">'setsid fail'</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Fork again avoid SVR4 system regain the control of terminal.</span></span><br><span class="line">        $pid = pcntl_fork();</span><br><span class="line">        <span class="keyword">if</span> ($pid === <span class="number">-1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="keyword">Exception</span>(<span class="string">'fork fail'</span>);</span><br><span class="line">        &#125; <span class="keyword">elseif</span> ($pid &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">exit</span>(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        umask(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">$this</span>-&gt;setProcessTitle(<span class="string">'master'</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Install signal.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">installSignal</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// stop</span></span><br><span class="line">        pcntl_signal(SIGINT, [<span class="keyword">$this</span>, <span class="string">'signalHandler'</span>], <span class="keyword">false</span>);</span><br><span class="line">        <span class="comment">// ignore</span></span><br><span class="line">        pcntl_signal(SIGPIPE, SIG_IGN, <span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Signal handler.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> $signal</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">signalHandler</span><span class="params">($signal)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">switch</span> ($signal) &#123;</span><br><span class="line">            <span class="keyword">case</span> SIGINT:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;stopAll();</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Stop all.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">stopAll</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// For master process</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;masterPid === posix_getpid()) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;log(<span class="string">"master process &#123;$this-&gt;masterPid&#125; stopping ..."</span>);</span><br><span class="line"></span><br><span class="line">            $childPidMap = array_merge(<span class="keyword">$this</span>-&gt;bucketPidMap, <span class="keyword">$this</span>-&gt;queuePidMap);</span><br><span class="line">            <span class="keyword">foreach</span> ($childPidMap <span class="keyword">as</span> $pid) &#123;</span><br><span class="line">                posix_kill($pid, SIGKILL);</span><br><span class="line">                <span class="keyword">$this</span>-&gt;log(<span class="string">"child process &#123;$pid&#125; stopping success."</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="comment">// For child processes</span></span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">exit</span>(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Save master pid.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">saveMasterPid</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;masterPid = posix_getpid();</span><br><span class="line">        <span class="keyword">if</span> (file_put_contents(<span class="keyword">$this</span>-&gt;pidFile, <span class="keyword">$this</span>-&gt;masterPid) === <span class="keyword">false</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="keyword">Exception</span>(<span class="string">'can not save pid to '</span> . <span class="keyword">$this</span>-&gt;pidFile);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Reset Std.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">resetStd</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;debug) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        fclose(STDIN);</span><br><span class="line">        fclose(STDOUT);</span><br><span class="line">        fclose(STDERR);</span><br><span class="line">        $stdoutFile = <span class="string">'/dev/null'</span>;</span><br><span class="line">        fopen($stdoutFile, <span class="string">'r'</span>);</span><br><span class="line">        fopen($stdoutFile, <span class="string">'a'</span>);</span><br><span class="line">        fopen($stdoutFile, <span class="string">'a'</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Scan Bucket in real time to handle delayed tasks.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">scanBucket</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> ($i = <span class="number">0</span>; $i &lt; <span class="keyword">$this</span>-&gt;bucketCount; $i++) &#123;</span><br><span class="line">            $pid = pcntl_fork();</span><br><span class="line">            <span class="keyword">if</span> ($pid &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">$this</span>-&gt;bucketPidMap[$pid] = $pid;</span><br><span class="line">            &#125; <span class="keyword">elseif</span> ($pid === <span class="number">-1</span>) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="keyword">Exception</span>(<span class="string">'bucket fork fail'</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">// Re-establish a redis connection for each process.</span></span><br><span class="line">                    <span class="keyword">static</span>::$redis = <span class="keyword">null</span>;</span><br><span class="line">                    $redis = <span class="keyword">$this</span>-&gt;getRedisInstance();</span><br><span class="line">                    $taskPoolKey = <span class="keyword">$this</span>-&gt;getTaskPoolKey();</span><br><span class="line">                    $bucketKey = <span class="keyword">$this</span>-&gt;getBucketKey(<span class="string">''</span>, $i);</span><br><span class="line">                    <span class="keyword">$this</span>-&gt;setProcessTitle(<span class="string">'bucket'</span>);</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">                        pcntl_signal_dispatch();</span><br><span class="line">                        <span class="comment">// Get a delay task with a delay time less than or equal to the current time</span></span><br><span class="line">                        $taskKeyArray = $redis-&gt;zRangeByScore($bucketKey, <span class="string">'-inf'</span>, time(), [</span><br><span class="line">                            <span class="string">'withscores'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">                            <span class="string">'limit'</span> =&gt; [<span class="number">0</span>, <span class="keyword">$this</span>-&gt;bucketRangeLimit],</span><br><span class="line">                        ]);</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">if</span> (!<span class="keyword">empty</span>($taskKeyArray)) &#123;</span><br><span class="line">                            <span class="keyword">foreach</span> ($taskKeyArray <span class="keyword">as</span> $taskKey =&gt; $score) &#123;</span><br><span class="line">                                <span class="keyword">if</span> ($task = $redis-&gt;hGet($taskPoolKey, $taskKey)) &#123;</span><br><span class="line">                                    <span class="comment">// Decode task.</span></span><br><span class="line">                                    $task = json_decode($task, <span class="keyword">true</span>);</span><br><span class="line">                                    <span class="keyword">if</span> ($task[<span class="string">'status'</span>] === <span class="keyword">static</span>::TASK_STATUS_DELAY) &#123;</span><br><span class="line">                                        <span class="comment">// Add lock.</span></span><br><span class="line">                                        $lockData = <span class="keyword">$this</span>-&gt;lock($taskKey);</span><br><span class="line"></span><br><span class="line">                                        <span class="keyword">if</span> ($lockData) &#123;</span><br><span class="line">                                            <span class="keyword">if</span> ($redis-&gt;zRem($bucketKey, $taskKey)) &#123;</span><br><span class="line">                                                <span class="comment">// Add tasks to different queues based on task priority</span></span><br><span class="line">                                                <span class="keyword">if</span> (!$redis-&gt;rPush(<span class="keyword">$this</span>-&gt;getQueueKey($task[<span class="string">'priority'</span>]), $taskKey)) &#123;</span><br><span class="line">                                                    <span class="keyword">$this</span>-&gt;log(<span class="string">"bucket rPush fail,taskKey=&#123;$taskKey&#125;"</span>);</span><br><span class="line">                                                &#125;</span><br><span class="line">                                            &#125;</span><br><span class="line"></span><br><span class="line">                                            <span class="comment">// Unlock.</span></span><br><span class="line">                                            <span class="keyword">$this</span>-&gt;unLock($lockData);</span><br><span class="line">                                        &#125;</span><br><span class="line">                                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                                        $redis-&gt;zRem($bucketKey, $taskKey);</span><br><span class="line">                                    &#125;</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (<span class="keyword">Exception</span> $e) &#123;</span><br><span class="line">                    <span class="keyword">$this</span>-&gt;log($e-&gt;getMessage());</span><br><span class="line">                    <span class="keyword">exit</span>(<span class="number">250</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Scan Queue in real time to handle tasks.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">scanQueue</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> ($i = <span class="number">0</span>; $i &lt; <span class="keyword">$this</span>-&gt;queueCount; $i++) &#123;</span><br><span class="line">            $pid = pcntl_fork();</span><br><span class="line">            <span class="keyword">if</span> ($pid &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">$this</span>-&gt;queuePidMap[$pid] = $pid;</span><br><span class="line">            &#125; <span class="keyword">elseif</span> ($pid === <span class="number">-1</span>) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="keyword">Exception</span>(<span class="string">'queue fork fail'</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">// Re-establish a redis connection for each process.</span></span><br><span class="line">                    <span class="keyword">static</span>::$redis = <span class="keyword">null</span>;</span><br><span class="line">                    $redis = <span class="keyword">$this</span>-&gt;getRedisInstance();</span><br><span class="line">                    $taskPoolKey = <span class="keyword">$this</span>-&gt;getTaskPoolKey();</span><br><span class="line">                    <span class="keyword">$this</span>-&gt;setProcessTitle(<span class="string">'queue'</span>);</span><br><span class="line">                    $queueTaskPriority = array_reverse(<span class="keyword">$this</span>-&gt;queueTaskPriority, <span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">                        pcntl_signal_dispatch();</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">foreach</span> ($queueTaskPriority <span class="keyword">as</span> $priority =&gt; $nums) &#123;</span><br><span class="line">                            $queueKey = <span class="keyword">$this</span>-&gt;getQueueKey($priority);</span><br><span class="line">                            <span class="comment">// Process $nums tasks each time, avoiding the inability to handle higher priority tasks</span></span><br><span class="line">                            <span class="keyword">while</span> ($nums--) &#123;</span><br><span class="line">                                $taskKey = $redis-&gt;lPop($queueKey);</span><br><span class="line">                                <span class="keyword">if</span> (<span class="keyword">empty</span>($taskKey)) &#123;</span><br><span class="line">                                    <span class="keyword">break</span>;</span><br><span class="line">                                &#125;</span><br><span class="line"></span><br><span class="line">                                <span class="keyword">if</span> ($task = $redis-&gt;hGet($taskPoolKey, $taskKey)) &#123;</span><br><span class="line">                                    $task = json_decode($task, <span class="keyword">true</span>);</span><br><span class="line">                                    <span class="keyword">if</span> ($task[<span class="string">'status'</span>] === <span class="keyword">static</span>::TASK_STATUS_DELAY &amp;&amp; $task[<span class="string">'delayTime'</span>] &lt;= time()) &#123;</span><br><span class="line">                                        $newTask = <span class="keyword">$this</span>-&gt;handleTask($task);</span><br><span class="line">                                        $redis-&gt;hSet($taskPoolKey, $taskKey, json_encode($newTask));</span><br><span class="line">                                        <span class="keyword">if</span> ($newTask[<span class="string">'status'</span>] === <span class="keyword">static</span>::TASK_STATUS_DELAY) &#123;</span><br><span class="line">                                            <span class="comment">// Save the task ID, with the task delay execution time as the sort value</span></span><br><span class="line">                                            $redis-&gt;zAdd(<span class="keyword">$this</span>-&gt;getBucketKey($newTask[<span class="string">'topic'</span>]), $newTask[<span class="string">'delayTime'</span>], $taskKey);</span><br><span class="line">                                        &#125;</span><br><span class="line">                                    &#125;</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (<span class="keyword">Exception</span> $e) &#123;</span><br><span class="line">                    <span class="keyword">$this</span>-&gt;log($e-&gt;getMessage());</span><br><span class="line">                    <span class="keyword">exit</span>(<span class="number">250</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Handle task.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> array $task</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> array</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">handleTask</span><span class="params">(array $task)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">empty</span>($task[<span class="string">'url'</span>])) &#123;</span><br><span class="line">            $result = <span class="keyword">static</span>::request($task[<span class="string">'url'</span>], $task[<span class="string">'params'</span>], $task[<span class="string">'method'</span>]);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">list</span> ($class, $action) = $task[<span class="string">'call'</span>];</span><br><span class="line">            <span class="keyword">if</span> (!class_exists($class) || !method_exists($class, $action)) &#123;</span><br><span class="line">                $result = <span class="string">'fail'</span>;</span><br><span class="line">                <span class="keyword">$this</span>-&gt;log(<span class="string">"call class &#123;$class&#125; not exists or action &#123;$action&#125; not exists."</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                $result = (<span class="keyword">new</span> $class())-&gt;$action($task);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $task[<span class="string">'lastRunTime'</span>] = date(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line">        $task[<span class="string">'rule'</span>][<span class="string">'count'</span>]++;</span><br><span class="line">        $result = strtolower((string)$result);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> ($result === <span class="string">'success'</span>) &#123;</span><br><span class="line">            $task[<span class="string">'status'</span>] = <span class="keyword">static</span>::TASK_STATUS_OK;</span><br><span class="line">            <span class="keyword">if</span> (!<span class="keyword">empty</span>($task[<span class="string">'callback'</span>])) &#123;</span><br><span class="line">                <span class="keyword">list</span> ($class, $action) = $task[<span class="string">'callback'</span>];</span><br><span class="line">                <span class="keyword">if</span> (!class_exists($class) || !method_exists($class, $action)) &#123;</span><br><span class="line">                    <span class="keyword">$this</span>-&gt;log(<span class="string">"callback class &#123;$class&#125; not exists or action &#123;$action&#125; not exists."</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    $result = (<span class="keyword">new</span> $class())-&gt;$action($task);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">elseif</span> ($result === <span class="string">'fail'</span>) &#123;</span><br><span class="line">            $task[<span class="string">'status'</span>] = <span class="keyword">static</span>::TASK_STATUS_FAIL;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            $index = $task[<span class="string">'rule'</span>][<span class="string">'count'</span>];</span><br><span class="line">            <span class="keyword">if</span> (!<span class="keyword">isset</span>($task[<span class="string">'rule'</span>][<span class="string">'interval'</span>][$index]) &amp;&amp; !$task[<span class="string">'rule'</span>][<span class="string">'persistent'</span>]) &#123;</span><br><span class="line">                $task[<span class="string">'status'</span>] = <span class="keyword">static</span>::TASK_STATUS_FAIL;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                $intervalTime = $task[<span class="string">'rule'</span>][<span class="string">'interval'</span>][$index] ?? end($task[<span class="string">'rule'</span>][<span class="string">'interval'</span>]);</span><br><span class="line">                $delayTime = $task[<span class="string">'delayTime'</span>] + $intervalTime;</span><br><span class="line">                $nowTime = time();</span><br><span class="line">                <span class="keyword">if</span> ($delayTime &lt; $nowTime) &#123;</span><br><span class="line">                    $delayTime = $nowTime + $intervalTime;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                $task[<span class="string">'delayTime'</span>] = $delayTime;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> $task;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Monitor process.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">monitorProcess</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">            pcntl_signal_dispatch();</span><br><span class="line">            $status = <span class="number">0</span>;</span><br><span class="line">            $pid = pcntl_wait($status, WUNTRACED);</span><br><span class="line">            pcntl_signal_dispatch();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> ($pid &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> ($status !== <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">$this</span>-&gt;log(<span class="string">"child process &#123;$pid&#125; exit with status &#123;$status&#125;"</span>);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">unset</span>(<span class="keyword">$this</span>-&gt;bucketPidMap[$pid], <span class="keyword">$this</span>-&gt;queuePidMap[$pid]);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">empty</span>(<span class="keyword">$this</span>-&gt;bucketPidMap) &amp;&amp; <span class="keyword">empty</span>(<span class="keyword">$this</span>-&gt;queuePidMap)) &#123;</span><br><span class="line">                @unlink(<span class="keyword">$this</span>-&gt;pidFile);</span><br><span class="line">                <span class="keyword">exit</span>(<span class="number">0</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Set process title.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> string $title</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">setProcessTitle</span><span class="params">(string $title)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (function_exists(<span class="string">'cli_set_process_title'</span>)) &#123;</span><br><span class="line">            cli_set_process_title(<span class="keyword">$this</span>-&gt;prefix . $title);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Log.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> string $msg</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">log</span><span class="params">(string $msg)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $msg = date(<span class="string">'Y-m-d H:i:s'</span>) . <span class="string">' ['</span> . <span class="keyword">static</span>::class . <span class="string">'] '</span> . $msg . PHP_EOL;</span><br><span class="line">        file_put_contents((string)<span class="keyword">$this</span>-&gt;logFile, $msg, FILE_APPEND | LOCK_EX);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>DelayedTask.php<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Sevming</span>\<span class="title">DelayedTask</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">RedisException</span>, <span class="title">Redis</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DelayedTask</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> string</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> $prefix = <span class="string">'dt_'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Get the number of delayed tasks each time.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> int</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> $bucketRangeLimit = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Number of bucket processes.(Number of storage bucket.)</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> int</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> $bucketCount = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Number of queue processes.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> int</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> $queueCount = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Redis config.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> array</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> $config = [];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Redis instance.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> null</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> $redis = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Number of task processing corresponding to queue priority.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> array</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> $queueTaskPriority = [</span><br><span class="line">        <span class="keyword">self</span>::QUEUE_PRIORITY_1 =&gt; <span class="number">2</span>,</span><br><span class="line">        <span class="keyword">self</span>::QUEUE_PRIORITY_2 =&gt; <span class="number">3</span>,</span><br><span class="line">        <span class="keyword">self</span>::QUEUE_PRIORITY_3 =&gt; <span class="number">5</span></span><br><span class="line">    ];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> int</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">const</span> QUEUE_PRIORITY_1 = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">const</span> QUEUE_PRIORITY_2 = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">const</span> QUEUE_PRIORITY_3 = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Task status delay.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> int</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">const</span> TASK_STATUS_DELAY = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Task status ok.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> int</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">const</span> TASK_STATUS_OK = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Task status fail.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> int</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">const</span> TASK_STATUS_FAIL = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Task status deleted.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> int</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">const</span> TASK_STATUS_DELETED = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Constructor.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> string $host</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> int    $port</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> string $auth</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(string $host = <span class="string">'127.0.0.1'</span>, int $port = <span class="number">6379</span>, string $auth = <span class="string">''</span>)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;config = [</span><br><span class="line">            <span class="string">'host'</span> =&gt; $host,</span><br><span class="line">            <span class="string">'port'</span> =&gt; $port,</span><br><span class="line">            <span class="string">'auth'</span> =&gt; $auth,</span><br><span class="line">        ];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Get redis.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> Redis</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> RedisException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">getRedisInstance</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">isset</span>(<span class="keyword">static</span>::$redis)) &#123;</span><br><span class="line">            $redis = <span class="keyword">new</span> \Redis();</span><br><span class="line">            $redis-&gt;connect(<span class="keyword">$this</span>-&gt;config[<span class="string">'host'</span>], <span class="keyword">$this</span>-&gt;config[<span class="string">'port'</span>]);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!$redis-&gt;auth(<span class="keyword">$this</span>-&gt;config[<span class="string">'auth'</span>])) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> RedisException(<span class="string">"redis password verification failed, auth=&#123;$this-&gt;config['auth']&#125;"</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> ($redis-&gt;ping() !== <span class="string">'+PONG'</span>) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> RedisException(<span class="string">"redis connection is not available, ping=&#123;$redis-&gt;ping()&#125;"</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">static</span>::$redis = $redis;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">static</span>::$redis;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Get task pool key.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> string</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">getTaskPoolKey</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;prefix . <span class="string">'task_pool'</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Get task key.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> string $topic</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> mixed  $id</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> string</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">getTaskKey</span><span class="params">(string $topic, $id)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> $topic . <span class="string">':'</span> . $id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Get bucket key.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> string $topic</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> bool   $flag</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> string</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">getBucketKey</span><span class="params">(string $topic = <span class="string">''</span>, $flag = false)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $key = crc32($topic) % <span class="keyword">$this</span>-&gt;bucketCount;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;prefix . <span class="string">'task_bucket:'</span> . ($flag !== <span class="keyword">false</span> ? $flag : $key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Get queue key.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> int $priority</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> string</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">getQueueKey</span><span class="params">(int $priority)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;prefix . <span class="string">'task_queue:'</span> . $priority;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Lock.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> string $taskKey</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> array|bool</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">lock</span><span class="params">(string $taskKey)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $redis = <span class="keyword">$this</span>-&gt;getRedisInstance();</span><br><span class="line">        $lockKey = <span class="keyword">$this</span>-&gt;prefix . <span class="string">'task_lock:'</span> . $taskKey;</span><br><span class="line">        $lockValue = md5(uniqid(md5(microtime(<span class="keyword">true</span>)), <span class="keyword">true</span>));</span><br><span class="line">        $status = $redis-&gt;set($lockKey, $lockValue, [<span class="string">'nx'</span>, <span class="string">'px'</span> =&gt; <span class="number">3000</span>]);</span><br><span class="line">        <span class="keyword">if</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">return</span> [$lockKey, $lockValue];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Unlock.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> array $lockData</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> bool</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">unlock</span><span class="params">(array $lockData)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $redis = <span class="keyword">$this</span>-&gt;getRedisInstance();</span><br><span class="line">        $script = <span class="string">"if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> $redis-&gt;eval($script, $lockData, <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>HttpTrait.php<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Sevming</span>\<span class="title">DelayedTask</span>\<span class="title">Traits</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">trait</span> HttpTrait</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Request.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> string $url</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> array  $params</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> string $method</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> int    $timeout</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> array  $headers</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> array  $userAgent</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> mixed</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">request</span><span class="params">(string $url, array $params = [], string $method = <span class="string">'GET'</span>, int $timeout = <span class="number">1</span>, array $headers = [], array $userAgent = [])</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!preg_match(<span class="string">'/^(http|https)/is'</span>, $url)) &#123;</span><br><span class="line">            $url = <span class="string">'http://'</span> . $url;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $ch = curl_init();</span><br><span class="line">        $method = strtoupper($method);</span><br><span class="line">        <span class="keyword">switch</span> ($method) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'GET'</span>:</span><br><span class="line">                $url .= <span class="string">'?'</span> . http_build_query($params);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'POST'</span>:</span><br><span class="line">                curl_setopt($ch, CURLOPT_POST, <span class="keyword">true</span>);</span><br><span class="line">                curl_setopt($ch, CURLOPT_POSTFIELDS, $params);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        curl_setopt($ch, CURLOPT_URL, $url);</span><br><span class="line">        curl_setopt($ch, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);</span><br><span class="line">        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, <span class="keyword">false</span>);</span><br><span class="line">        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> ($timeout &gt; <span class="number">0</span> &amp;&amp; $timeout &lt; <span class="number">1</span>) &#123;</span><br><span class="line">            $timeout = (int)($timeout * <span class="number">1000</span>);</span><br><span class="line">            curl_setopt($ch, CURLOPT_NOSIGNAL, <span class="keyword">true</span>);</span><br><span class="line">            curl_setopt($ch, CURLOPT_TIMEOUT_MS, $timeout);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            $timeout = (int)$timeout;</span><br><span class="line">            curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">empty</span>($headers)) &#123;</span><br><span class="line">            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">empty</span>($userAgent)) &#123;</span><br><span class="line">            curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $result = curl_exec($ch);</span><br><span class="line">        $errno = curl_errno($ch);</span><br><span class="line">        curl_close($ch);</span><br><span class="line">        <span class="keyword">if</span> (!$errno) &#123;</span><br><span class="line">            <span class="keyword">return</span> $result;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>Mr</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://sevming.github.io/PHP/delayed-task.html" title="Redis 延迟任务">http://sevming.github.io/PHP/delayed-task.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/php/" rel="tag"># php</a>
+          
+            <a href="/tags/redis/" rel="tag"># redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/PHP/redis-distributed-lock.html" rel="next" title="Redis 分布式锁">
+                <i class="fa fa-chevron-left"></i> Redis 分布式锁
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/MySQL/mysql-get-random-data.html" rel="prev" title="MySQL 随机获取N条数据">
+                MySQL 随机获取N条数据 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.png"
+                alt="Mr" />
+            
+              <p class="site-author-name" itemprop="name">Mr</p>
+              <p class="site-description motion-element" itemprop="description">懒........</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">102</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://novnan.github.io" title="Novnan" target="_blank">Novnan</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://zhengyongshun.com" title="挨踢Blog" target="_blank">挨踢Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://25550808.github.io" title="Eagle" target="_blank">Eagle</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://luscio.github.io" title="Timber" target="_blank">Timber</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://952425340.github.io" title="谢炳南" target="_blank">谢炳南</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#业务场景"><span class="nav-number">1.</span> <span class="nav-text">业务场景</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#方案一：定时任务"><span class="nav-number">2.</span> <span class="nav-text">方案一：定时任务</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#方案二：redis-psubscribe"><span class="nav-number">3.</span> <span class="nav-text">方案二：redis psubscribe</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#方案三：redis-psubscribe-queue"><span class="nav-number">4.</span> <span class="nav-text">方案三：redis psubscribe + queue</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#方案四：延迟任务-DelayedTask"><span class="nav-number">5.</span> <span class="nav-text">方案四：延迟任务 DelayedTask</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mr</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.2"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#more");
+  
+  </script>
+
+
+</body>
+</html>

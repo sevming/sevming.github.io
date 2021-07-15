@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="php,sku," />
+
+
+<meta name="description" content="商品SKUps: 暂时只有新增, 后续补充编辑 创建相关表1234567891011121314151617181920212223242526272829303132333435363738394041424344CREATE TABLE `goods` (`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT &apos;商品ID&apos;,`goods_ti">
+<meta name="keywords" content="php,sku">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP 商品SKU">
+<meta property="og:url" content="http://sevming.github.io/PHP/goods-sku.html">
+<meta property="og:site_name" content="Mr.Blog">
+<meta property="og:description" content="商品SKUps: 暂时只有新增, 后续补充编辑 创建相关表1234567891011121314151617181920212223242526272829303132333435363738394041424344CREATE TABLE `goods` (`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT &apos;商品ID&apos;,`goods_ti">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-07-15T04:00:35.448Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP 商品SKU">
+<meta name="twitter:description" content="商品SKUps: 暂时只有新增, 后续补充编辑 创建相关表1234567891011121314151617181920212223242526272829303132333435363738394041424344CREATE TABLE `goods` (`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT &apos;商品ID&apos;,`goods_ti">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Mr.Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://sevming.github.io/PHP/goods-sku.html"/>
+
+
+  <title>PHP 商品SKU | Mr.Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr.Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+  
+  
+  
+    <a href="https://github.com/sevming" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sevming.github.io/PHP/goods-sku.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mr">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr.Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PHP 商品SKU</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-23T14:59:52+00:00">2019-12-23</time>
+            
+
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/PHP/" itemprop="url" rel="index"><span itemprop="name">PHP</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <div class="note danger"><p>商品SKU<br><code>ps: 暂时只有新增, 后续补充编辑</code></p></div>
+<h5 id="创建相关表"><a href="#创建相关表" class="headerlink" title="创建相关表"></a>创建相关表</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`goods`</span> (</span><br><span class="line"><span class="string">`id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">UNSIGNED</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT <span class="keyword">COMMENT</span> <span class="string">'商品ID'</span>,</span><br><span class="line"><span class="string">`goods_title`</span> <span class="built_in">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'商品标题'</span>,</span><br><span class="line"><span class="string">`generate_time`</span> DATETIME <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'创建时间'</span>,</span><br><span class="line">PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>) <span class="keyword">USING</span> BTREE</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 <span class="keyword">COMMENT</span>=<span class="string">'商品表'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`goods_sku`</span> (</span><br><span class="line"><span class="string">`id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">UNSIGNED</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT <span class="keyword">COMMENT</span> <span class="string">'SKU ID'</span>,</span><br><span class="line"><span class="string">`goods_id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'商品ID'</span>,</span><br><span class="line"><span class="string">`title`</span> <span class="built_in">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'集成名称'</span>,</span><br><span class="line"><span class="string">`price`</span> <span class="built_in">DECIMAL</span>(<span class="number">11</span>,<span class="number">2</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'价格'</span>,</span><br><span class="line"><span class="string">`stock`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'库存'</span>,</span><br><span class="line">PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>) <span class="keyword">USING</span> BTREE</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 <span class="keyword">COMMENT</span>=<span class="string">'商品SKU信息表'</span>;</span><br><span class="line"> *</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`goods_sku_serial`</span> (</span><br><span class="line"><span class="string">`id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">UNSIGNED</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT,</span><br><span class="line"><span class="string">`goods_id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'商品ID'</span>,</span><br><span class="line"><span class="string">`goods_sku_id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'商品SKU ID'</span>,</span><br><span class="line"><span class="string">`goods_spec_type_id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'商品规格类型ID'</span>,</span><br><span class="line"><span class="string">`goods_spec_type_name`</span> <span class="built_in">VARCHAR</span>(<span class="number">32</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'商品规格类型名称'</span>,</span><br><span class="line"><span class="string">`goods_spec_value_id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'商品规格类型值ID'</span>,</span><br><span class="line"><span class="string">`goods_spec_value_name`</span> <span class="built_in">VARCHAR</span>(<span class="number">32</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'商品规格类型值名称'</span>,</span><br><span class="line">PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>) <span class="keyword">USING</span> BTREE</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 <span class="keyword">COMMENT</span>=<span class="string">'SKU与规格关系表'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`goods_spec_type`</span> (</span><br><span class="line"><span class="string">`id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">UNSIGNED</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT <span class="keyword">COMMENT</span> <span class="string">'规格类型ID'</span>,</span><br><span class="line"><span class="string">`goods_id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'商品ID'</span>,</span><br><span class="line"><span class="string">`type_name`</span> <span class="built_in">VARCHAR</span>(<span class="number">32</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'规格类型名称'</span>,</span><br><span class="line">PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>) <span class="keyword">USING</span> BTREE,</span><br><span class="line"><span class="keyword">KEY</span> <span class="string">`goods_id`</span> (<span class="string">`goods_id`</span>) <span class="keyword">USING</span> BTREE</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 <span class="keyword">COMMENT</span>=<span class="string">'商品规格类型表'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`goods_spec_value`</span> (</span><br><span class="line"><span class="string">`id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">UNSIGNED</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT <span class="keyword">COMMENT</span> <span class="string">'规格项ID'</span>,</span><br><span class="line"><span class="string">`goods_id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'商品ID'</span>,</span><br><span class="line"><span class="string">`spec_type_id`</span> <span class="built_in">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'规格类型ID'</span>,</span><br><span class="line"><span class="string">`value_name`</span> <span class="built_in">VARCHAR</span>(<span class="number">32</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'规格项名称'</span>,</span><br><span class="line">PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>) <span class="keyword">USING</span> BTREE,</span><br><span class="line"><span class="keyword">KEY</span> <span class="string">`goods_id`</span> (<span class="string">`goods_id`</span>) <span class="keyword">USING</span> BTREE,</span><br><span class="line"><span class="keyword">KEY</span> <span class="string">`spec_type_id`</span> (<span class="string">`spec_type_id`</span>) <span class="keyword">USING</span> BTREE</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8 <span class="keyword">COMMENT</span>=<span class="string">'商品规格项表'</span>;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h5 id="前端代码"><a href="#前端代码" class="headerlink" title="前端代码"></a>前端代码</h5><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>SKU<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"static/plugin/bootstrap/css/bootstrap.min.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"static/plugin/font-awesome/css/font-awesome.min.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"static/plugin/toastr/toastr.min.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"static/jquery-3.3.1.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"static/plugin/bootstrap/js/bootstrap.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"static/plugin/toastr/toastr.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">        a, a:focus, a:hover &#123;text-decoration: none;&#125;</span></span><br><span class="line"><span class="undefined">        .c-red &#123;</span></span><br><span class="line"><span class="undefined">            color: red;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec &#123;</span></span><br><span class="line"><span class="undefined">            /*display: none;*/</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec .spec &#123;</span></span><br><span class="line"><span class="undefined">            margin-bottom: 15px;</span></span><br><span class="line"><span class="undefined">            padding: 10px;</span></span><br><span class="line"><span class="undefined">            border: 1px solid #E7EAEC;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec .spec .spec-items .spec-item &#123;</span></span><br><span class="line"><span class="undefined">            position: relative;</span></span><br><span class="line"><span class="undefined">            float: left;</span></span><br><span class="line"><span class="undefined">            width: 250px;</span></span><br><span class="line"><span class="undefined">            margin: 0 10px 10px 0;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec .spec .spec-items .spec-item:last-child &#123;</span></span><br><span class="line"><span class="undefined">            margin-bottom: -5px;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec .spec-btn-table &#123;</span></span><br><span class="line"><span class="undefined">            margin-bottom: 15px;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec .spec-btn-table &gt; tbody &gt; tr &gt; td &#123;</span></span><br><span class="line"><span class="undefined">            padding-left: 0;</span></span><br><span class="line"><span class="undefined">            border: 0;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec .spec-btn-table .alert-danger &#123;</span></span><br><span class="line"><span class="undefined">            margin-bottom: 0;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec .table &gt; thead &gt; tr &gt; th, #goods-spec .table &gt; tbody &gt; tr &gt; td &#123;</span></span><br><span class="line"><span class="undefined">            vertical-align: middle;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec .spec-btn-table &gt; tbody &gt; tr:last-child &#123;</span></span><br><span class="line"><span class="undefined">            display: none;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec .spec-btn-table a &#123;</span></span><br><span class="line"><span class="undefined">            margin-right: 10px;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec .sku .sku-title &#123;</span></span><br><span class="line"><span class="undefined">            padding-bottom: 10px;</span></span><br><span class="line"><span class="undefined">            text-align: center;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec .sku .table &#123;</span></span><br><span class="line"><span class="undefined">            table-layout: fixed;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        #goods-spec .sku .table input &#123;</span></span><br><span class="line"><span class="undefined">            font-weight: normal;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">form</span> <span class="attr">class</span>=<span class="string">"form-horizontal"</span> <span class="attr">action</span>=<span class="string">"sku.php"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"goods-spec"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"alert alert-info"</span>&gt;</span></span><br><span class="line">                    1. 更改规格及规格项后请点击下方的【刷新规格项目表】来更新数据<span class="tag">&lt;<span class="name">br</span>&gt;</span></span><br><span class="line">                    2. 每一种规格代表不同型号,例如颜色为一种规格,尺寸为一种规格,如果设置多规格,手机用户必须每一种规格都选择一个规格项,才能添加购物车或购买</span><br><span class="line">                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"specs"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">table</span> <span class="attr">class</span>=<span class="string">"table spec-btn-table"</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">tbody</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">td</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:;"</span> <span class="attr">class</span>=<span class="string">"btn btn-primary"</span> <span class="attr">id</span>=<span class="string">"add-spec"</span> <span class="attr">title</span>=<span class="string">"添加规格"</span>&gt;</span><span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">"fa fa-plus"</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span> 添加规格<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:;"</span> <span class="attr">title</span>=<span class="string">"刷新规格项目表"</span> <span class="attr">class</span>=<span class="string">"btn btn-danger refresh-spec"</span>&gt;</span><span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">"fa fa-refresh"</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span> 刷新规格项目表<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">td</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"alert alert-danger"</span>&gt;</span>警告：规格数据有变动，请重新点击上方 [刷新规格项目表] 按钮！<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">tbody</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"sku"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">class</span>=<span class="string">"btn btn-success"</span>&gt;</span>Submit<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">        $(function() &#123;</span></span><br><span class="line"><span class="undefined">            toastr.options = &#123;</span></span><br><span class="line"><span class="undefined">                closeButton: true,</span></span><br><span class="line"><span class="undefined">                progressBar: true,</span></span><br><span class="line"><span class="undefined">            &#125;;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">            $('form').on('submit', function () &#123;</span></span><br><span class="line"><span class="undefined">                $.ajax(&#123;</span></span><br><span class="line"><span class="undefined">                    url: 'sku.php',</span></span><br><span class="line"><span class="undefined">                    type: 'POST',</span></span><br><span class="line"><span class="undefined">                    data: $('form').serialize(),</span></span><br><span class="line"><span class="undefined">                    success: function () &#123;</span></span><br><span class="line"><span class="undefined">                    &#125;</span></span><br><span class="line"><span class="undefined">                &#125;);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                return false;</span></span><br><span class="line"><span class="undefined">            &#125;)</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">            $(document).on('input propertychange change', '.specs input', function () &#123;</span></span><br><span class="line"><span class="undefined">                window.optionchanged = true;</span></span><br><span class="line"><span class="undefined">                $('.spec-btn-table &gt; tbody &gt; tr:last-child').show();</span></span><br><span class="line"><span class="undefined">            &#125;);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">            let goodsSku = &#123;&#125;;</span></span><br><span class="line"><span class="undefined">            // 添加规格</span></span><br><span class="line"><span class="undefined">            $('#add-spec').on('click', function () &#123;</span></span><br><span class="line"><span class="undefined">                let specid = (new Date()).valueOf().toString(16);</span></span><br><span class="line"><span class="undefined">                let html = `</span></span><br><span class="line"><span class="xml">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"spec"</span> <span class="attr">id</span>=<span class="string">"spec-$&#123;specid&#125;"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"form-group"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-sm-12"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"input-group"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                                <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"spec[$&#123;specid&#125;]"</span> <span class="attr">value</span>=<span class="string">""</span> <span class="attr">class</span>=<span class="string">"form-control spec-title"</span> <span class="attr">placeholder</span>=<span class="string">"规格名称 (比如: 颜色)"</span>/&gt;</span></span></span><br><span class="line"><span class="xml">                                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"input-group-btn"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                                    <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:;"</span> <span class="attr">specid</span>=<span class="string">"$&#123;specid&#125;"</span> <span class="attr">class</span>=<span class="string">"btn btn-info add-spec-item"</span>&gt;</span><span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">"fa fa-plus"</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span> 添加规格项<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span></span><br><span class="line"><span class="xml">                                    <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:;"</span> <span class="attr">specid</span>=<span class="string">"$&#123;specid&#125;"</span> <span class="attr">class</span>=<span class="string">"btn btn-danger remove-spec"</span>&gt;</span><span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">"fa fa-remove"</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></span></span><br><span class="line"><span class="xml">                                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">                            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">                    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">                    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"form-group"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-md-12"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                            <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"spec-items-$&#123;specid&#125;"</span> <span class="attr">class</span>=<span class="string">"spec-items"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">                    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="undefined">            `;</span></span><br><span class="line"><span class="undefined">                $('.specs').append(html);</span></span><br><span class="line"><span class="undefined">            &#125;);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">            // 删除规格</span></span><br><span class="line"><span class="undefined">            $(document).on('click', '.remove-spec', function () &#123;</span></span><br><span class="line"><span class="undefined">                $('#spec-' + $(this).attr('specid')).remove();</span></span><br><span class="line"><span class="undefined">            &#125;);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">            // 添加规格项</span></span><br><span class="line"><span class="undefined">            $(document).on('click', '.add-spec-item', function () &#123;</span></span><br><span class="line"><span class="undefined">                let specid = $(this).attr('specid');</span></span><br><span class="line"><span class="undefined">                let specitemid = (new Date()).valueOf().toString(16);</span></span><br><span class="line"><span class="undefined">                let html = `</span></span><br><span class="line"><span class="xml">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"spec-item"</span> <span class="attr">data-specitemid</span>=<span class="string">"$&#123;specitemid&#125;"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"input-group"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">class</span>=<span class="string">"form-control spec-item-title"</span> <span class="attr">name</span>=<span class="string">"spec_item[$&#123;specid&#125;][$&#123;specitemid&#125;]"</span> <span class="attr">value</span>=<span class="string">""</span> <span class="attr">placeholder</span>=<span class="string">"规格项"</span> /&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"input-group-addon"</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:;"</span> <span class="attr">class</span>=<span class="string">"remove-spec-item"</span>&gt;</span><span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">"fa fa-times"</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span></span><br><span class="line"><span class="xml">                    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="undefined">            `;</span></span><br><span class="line"><span class="undefined">                $('#spec-items-' + specid).append(html);</span></span><br><span class="line"><span class="undefined">                let len = $('#spec-items-' + specid + ' .spec-item-title').length -1;</span></span><br><span class="line"><span class="undefined">                $('#spec-items-' + specid + ' .spec-item-title:eq(' + len +  ')').focus();</span></span><br><span class="line"><span class="undefined">            &#125;);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">            // 删除规格项</span></span><br><span class="line"><span class="undefined">            $(document).on('click', '.remove-spec-item', function () &#123;</span></span><br><span class="line"><span class="undefined">                $(this).closest('.spec-item').remove();</span></span><br><span class="line"><span class="undefined">            &#125;);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">            // 规格项目批量设置</span></span><br><span class="line"><span class="undefined">            $(document).on('click', '.sku-all', function() &#123;</span></span><br><span class="line"><span class="undefined">                let cls = '.sku-' + $(this).data('text');</span></span><br><span class="line"><span class="undefined">                $(cls).val($(cls + '-all').val());</span></span><br><span class="line"><span class="undefined">            &#125;);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">            // 刷新规格项目表</span></span><br><span class="line"><span class="undefined">            $('.refresh-spec').on('click', refreshSpec);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">            // 刷新规格项目表</span></span><br><span class="line"><span class="undefined">            function refreshSpec() &#123;</span></span><br><span class="line"><span class="xml">                let html = '<span class="tag">&lt;<span class="name">table</span> <span class="attr">class</span>=<span class="string">"table table-bordered table-condensed"</span>&gt;</span><span class="tag">&lt;<span class="name">thead</span>&gt;</span><span class="tag">&lt;<span class="name">tr</span> <span class="attr">class</span>=<span class="string">"active"</span>&gt;</span>';</span></span><br><span class="line"><span class="undefined">                let specs = [];</span></span><br><span class="line"><span class="undefined">                let specFlag = true;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                // 未添加规格</span></span><br><span class="line"><span class="undefined">                if ($('.spec').length &lt;= 0) &#123;</span></span><br><span class="line"><span class="undefined">                    return;</span></span><br><span class="line"><span class="undefined">                &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                // 获取规格/规格项JSON数据</span></span><br><span class="line"><span class="undefined">                $('.spec').each(function(i) &#123;</span></span><br><span class="line"><span class="undefined">                    let _this = $(this);</span></span><br><span class="line"><span class="undefined">                    let specTitle = _this.find('.spec-title').val();</span></span><br><span class="line"><span class="undefined">                    if (!specTitle || specTitle === 'undefined') &#123;</span></span><br><span class="line"><span class="undefined">                        specFlag = false;</span></span><br><span class="line"><span class="undefined">                        _this.find('.spec-title').focus();</span></span><br><span class="line"><span class="undefined">                        toastr.error('规格名称不能为空!');</span></span><br><span class="line"><span class="undefined">                        return;</span></span><br><span class="line"><span class="undefined">                    &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                    let spec = &#123;title: specTitle&#125;;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                    if (_this.find('.spec-item').length &lt;= 0) &#123;</span></span><br><span class="line"><span class="undefined">                        specFlag = false;</span></span><br><span class="line"><span class="undefined">                        toastr.error('请先添加规格项!');</span></span><br><span class="line"><span class="undefined">                        return;</span></span><br><span class="line"><span class="undefined">                    &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                    let items = [];</span></span><br><span class="line"><span class="undefined">                    _this.find('.spec-item').each(function() &#123;</span></span><br><span class="line"><span class="undefined">                        let __this = $(this);</span></span><br><span class="line"><span class="undefined">                        let itemTitle = __this.find('.spec-item-title').val();</span></span><br><span class="line"><span class="undefined">                        if (!itemTitle || itemTitle === 'undefined') &#123;</span></span><br><span class="line"><span class="undefined">                            specFlag = false;</span></span><br><span class="line"><span class="undefined">                            __this.find('.spec-item-title').focus();</span></span><br><span class="line"><span class="undefined">                            toastr.error('规格项不能为空!');</span></span><br><span class="line"><span class="undefined">                            return;</span></span><br><span class="line"><span class="undefined">                        &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                        let item = &#123;</span></span><br><span class="line"><span class="undefined">                            id: __this.data('specitemid'),</span></span><br><span class="line"><span class="undefined">                            title: itemTitle,</span></span><br><span class="line"><span class="undefined">                        &#125;;</span></span><br><span class="line"><span class="undefined">                        items.push(item);</span></span><br><span class="line"><span class="undefined">                    &#125;);</span></span><br><span class="line"><span class="undefined">                    spec.items = items;</span></span><br><span class="line"><span class="undefined">                    specs.push(spec);</span></span><br><span class="line"><span class="undefined">                &#125;);</span></span><br><span class="line"><span class="undefined">                if (!specFlag) return;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                // 计算规格的所有组合,并生成rowSpans</span></span><br><span class="line"><span class="undefined">                let specLen = specs.length;</span></span><br><span class="line"><span class="undefined">                // 规格的所有组合</span></span><br><span class="line"><span class="undefined">                let skuNums = 1;</span></span><br><span class="line"><span class="undefined">                // 规格表格数组</span></span><br><span class="line"><span class="undefined">                let specTable = new Array(specLen);</span></span><br><span class="line"><span class="undefined">                // 单元格的rowSpan</span></span><br><span class="line"><span class="undefined">                let rowSpans = new Array(specLen);</span></span><br><span class="line"><span class="undefined">                for (let i = 0; i &lt; specLen; i++) &#123;</span></span><br><span class="line"><span class="xml">                    html += '<span class="tag">&lt;<span class="name">th</span>&gt;</span>' + specs[i].title + '<span class="tag">&lt;/<span class="name">th</span>&gt;</span>';</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                    let itemLen = specs[i].items.length;</span></span><br><span class="line"><span class="undefined">                    if (itemLen &lt;= 0) &#123;</span></span><br><span class="line"><span class="undefined">                        itemLen = 1;</span></span><br><span class="line"><span class="undefined">                    &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                    skuNums *= itemLen;</span></span><br><span class="line"><span class="undefined">                    specTable[i] = new Array(skuNums);</span></span><br><span class="line"><span class="undefined">                    for (let j = 0; j &lt; skuNums; j++) &#123;</span></span><br><span class="line"><span class="undefined">                        specTable[i][j] = new Array();</span></span><br><span class="line"><span class="undefined">                    &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                    itemLen = specs[i].items.length;</span></span><br><span class="line"><span class="undefined">                    rowSpans[i] = 1;</span></span><br><span class="line"><span class="undefined">                    for (let j = i + 1; j &lt; specLen; j++) &#123;</span></span><br><span class="line"><span class="undefined">                        rowSpans[i] *= specs[j].items.length;</span></span><br><span class="line"><span class="undefined">                    &#125;</span></span><br><span class="line"><span class="undefined">                &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                html += `</span></span><br><span class="line"><span class="xml">                <span class="tag">&lt;<span class="name">th</span>&gt;</span></span></span><br><span class="line"><span class="xml">                    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"sku-title"</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"c-red"</span>&gt;</span>* <span class="tag">&lt;/<span class="name">span</span>&gt;</span>价格 (元)<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">                    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"input-group"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">value</span>=<span class="string">""</span> <span class="attr">class</span>=<span class="string">"form-control input-sm sku-price-all"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"input-group-addon"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                            <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:;"</span> <span class="attr">class</span>=<span class="string">"fa fa-angle-double-down sku-all"</span> <span class="attr">data-text</span>=<span class="string">"price"</span> <span class="attr">title</span>=<span class="string">"批量设置"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;/<span class="name">span</span>&gt;</span></span></span><br><span class="line"><span class="xml">                    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">                <span class="tag">&lt;/<span class="name">th</span>&gt;</span></span></span><br><span class="line"><span class="xml">                <span class="tag">&lt;<span class="name">th</span>&gt;</span></span></span><br><span class="line"><span class="xml">                    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"sku-title"</span>&gt;</span><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"c-red"</span>&gt;</span>* <span class="tag">&lt;/<span class="name">span</span>&gt;</span>数量 (件)<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">                    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"input-group"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">value</span>=<span class="string">""</span> <span class="attr">class</span>=<span class="string">"form-control input-sm sku-stock-all"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"input-group-addon"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                            <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:;"</span> <span class="attr">class</span>=<span class="string">"fa fa-angle-double-down sku-all"</span> <span class="attr">data-text</span>=<span class="string">"stock"</span> <span class="attr">title</span>=<span class="string">"批量设置"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;/<span class="name">span</span>&gt;</span></span></span><br><span class="line"><span class="xml">                    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">                <span class="tag">&lt;/<span class="name">th</span>&gt;</span></span></span><br><span class="line"><span class="undefined">            `;</span></span><br><span class="line"><span class="xml">                html += '<span class="tag">&lt;/<span class="name">tr</span>&gt;</span><span class="tag">&lt;/<span class="name">thead</span>&gt;</span>';</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                // 规格表格数据填充</span></span><br><span class="line"><span class="undefined">                for (let m = 0; m &lt; specLen; m++) &#123;</span></span><br><span class="line"><span class="undefined">                    let itemIndex = 0, k = 0;</span></span><br><span class="line"><span class="undefined">                    for (let j = 0; j &lt; skuNums; j++) &#123;</span></span><br><span class="line"><span class="undefined">                        let rowSpan = rowSpans[m];</span></span><br><span class="line"><span class="undefined">                        let specItem = specs[m].items[itemIndex] || &#123;&#125;;</span></span><br><span class="line"><span class="undefined">                        let specItemTitle = !specItem.title || specItem.title === 'undefined' ? '' : specItem.title;</span></span><br><span class="line"><span class="undefined">                        let tdData = &#123;</span></span><br><span class="line"><span class="undefined">                            id: specItem.id,</span></span><br><span class="line"><span class="undefined">                            title: specItemTitle,</span></span><br><span class="line"><span class="undefined">                            html: '',</span></span><br><span class="line"><span class="undefined">                        &#125;;</span></span><br><span class="line"><span class="undefined">                        if (j % rowSpan === 0) &#123;</span></span><br><span class="line"><span class="xml">                            tdData.html = '<span class="tag">&lt;<span class="name">td</span> <span class="attr">rowspan</span>=<span class="string">"' + rowSpan + '"</span>&gt;</span>' + specItemTitle + '<span class="tag">&lt;/<span class="name">td</span>&gt;</span>';</span></span><br><span class="line"><span class="undefined">                        &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                        specTable[m][j] = tdData;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                        k++;</span></span><br><span class="line"><span class="undefined">                        if (k === rowSpan) &#123;</span></span><br><span class="line"><span class="undefined">                            itemIndex++;</span></span><br><span class="line"><span class="undefined">                            if (itemIndex &gt; specs[m].items.length - 1) &#123;</span></span><br><span class="line"><span class="undefined">                                itemIndex = 0;</span></span><br><span class="line"><span class="undefined">                            &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                            k = 0;</span></span><br><span class="line"><span class="undefined">                        &#125;</span></span><br><span class="line"><span class="undefined">                    &#125;</span></span><br><span class="line"><span class="undefined">                &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                // 生成规格项目表</span></span><br><span class="line"><span class="undefined">                let specTableHtml = '';</span></span><br><span class="line"><span class="undefined">                for (let i = 0; i &lt; skuNums; i++) &#123;</span></span><br><span class="line"><span class="xml">                    specTableHtml += '<span class="tag">&lt;<span class="name">tr</span>&gt;</span>';</span></span><br><span class="line"><span class="undefined">                    let ids = [], titles = [];</span></span><br><span class="line"><span class="undefined">                    for (let j = 0; j &lt; specLen; j++) &#123;</span></span><br><span class="line"><span class="undefined">                        specTableHtml += specTable[j][i].html;</span></span><br><span class="line"><span class="undefined">                        ids.push(specTable[j][i].id);</span></span><br><span class="line"><span class="undefined">                        titles.push(specTable[j][i].title);</span></span><br><span class="line"><span class="undefined">                    &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                    ids = ids.join('_');</span></span><br><span class="line"><span class="undefined">                    let skuData = &#123;</span></span><br><span class="line"><span class="undefined">                        id: goodsSku.hasOwnProperty(ids) ? goodsSku[ids].id : 0,</span></span><br><span class="line"><span class="undefined">                        price: goodsSku.hasOwnProperty(ids) ? goodsSku[ids].price : '',</span></span><br><span class="line"><span class="undefined">                        stock: goodsSku.hasOwnProperty(ids) ? goodsSku[ids].stock : '',</span></span><br><span class="line"><span class="undefined">                    &#125;;</span></span><br><span class="line"><span class="undefined">                    specTableHtml += `</span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;<span class="name">td</span> <span class="attr">rowspan</span>=<span class="string">"1"</span>&gt;</span></span></span><br><span class="line"><span class="xml">                            <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"hidden"</span> <span class="attr">name</span>=<span class="string">"sku[$&#123;ids&#125;][id]"</span> <span class="attr">value</span>=<span class="string">"$&#123;skuData.id&#125;"</span> <span class="attr">class</span>=<span class="string">"form-control"</span> /&gt;</span></span></span><br><span class="line"><span class="xml">                            <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"sku[$&#123;ids&#125;][price]"</span> <span class="attr">value</span>=<span class="string">"$&#123;skuData.price&#125;"</span> <span class="attr">class</span>=<span class="string">"form-control sku-price"</span> /&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;/<span class="name">td</span>&gt;</span></span></span><br><span class="line"><span class="xml">                        <span class="tag">&lt;<span class="name">td</span> <span class="attr">rowspan</span>=<span class="string">"1"</span>&gt;</span><span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"sku[$&#123;ids&#125;][stock]"</span> <span class="attr">value</span>=<span class="string">"$&#123;skuData.stock&#125;"</span> <span class="attr">class</span>=<span class="string">"form-control sku-stock"</span> /&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span></span><br><span class="line"><span class="undefined">                    `;</span></span><br><span class="line"><span class="xml">                    specTableHtml += '<span class="tag">&lt;/<span class="name">tr</span>&gt;</span>';</span></span><br><span class="line"><span class="undefined">                &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                html += specTableHtml;</span></span><br><span class="line"><span class="xml">                html += '<span class="tag">&lt;/<span class="name">table</span>&gt;</span>';</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                $('.sku').html(html);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">                // 刷新后重置</span></span><br><span class="line"><span class="undefined">                window.optionchanged = false;</span></span><br><span class="line"><span class="undefined">                $('.spec-btn-table &gt; tbody &gt; tr:last-child').hide();</span></span><br><span class="line"><span class="undefined">            &#125;</span></span><br><span class="line"><span class="undefined">        &#125;);</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h5 id="服务端代码"><a href="#服务端代码" class="headerlink" title="服务端代码"></a>服务端代码</h5><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$postData = $_POST;</span><br><span class="line"><span class="comment">// 商品规格</span></span><br><span class="line">$specArray = $_POST[<span class="string">'spec'</span>];</span><br><span class="line"><span class="comment">// 商品规格项</span></span><br><span class="line">$specItemArray = $_POST[<span class="string">'spec_item'</span>];</span><br><span class="line"><span class="comment">// 商品SKU</span></span><br><span class="line">$skuArray = $_POST[<span class="string">'sku'</span>];</span><br><span class="line"><span class="comment">// SKU所有组合数量</span></span><br><span class="line">$skuNums = <span class="number">1</span>;</span><br><span class="line"><span class="comment">// 商品规格及规格项校验</span></span><br><span class="line"><span class="keyword">foreach</span> ($specArray <span class="keyword">as</span> $specId =&gt; $specName) &#123;</span><br><span class="line">    $specItem = $specItemArray[$specId] ?? [];</span><br><span class="line">    <span class="keyword">if</span> (!$specItem || <span class="keyword">empty</span>($specName)) &#123;</span><br><span class="line">        <span class="keyword">exit</span>(<span class="string">'商品规格参数错误'</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">foreach</span> ($specItem <span class="keyword">as</span> $itemName) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">empty</span>($itemName)) &#123;</span><br><span class="line">            <span class="keyword">exit</span>(<span class="string">'商品规格参数错误'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    $skuNums *= count($specItem);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 商品SKU一次不能生成太多,容易造成内存溢出</span></span><br><span class="line"><span class="keyword">if</span> (count($skuArray) &gt; <span class="number">500</span>) &#123;</span><br><span class="line">    <span class="keyword">exit</span>(<span class="string">'商品规格项目生成数量过多,请求失败'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 商品SKU</span></span><br><span class="line"><span class="keyword">if</span> (count($skuArray) !== $skuNums) &#123;</span><br><span class="line">    <span class="keyword">exit</span>(<span class="string">'商品规格参数错误'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// TODO 若严格点校验的话,可通过商品规格和规格项生成SKU,再进行验证</span></span><br><span class="line"><span class="keyword">foreach</span> ($skuArray <span class="keyword">as</span> &amp;$sku) &#123;</span><br><span class="line">    $sku = [</span><br><span class="line">        <span class="string">'price'</span> =&gt; bcadd($sku[<span class="string">'price'</span>], <span class="number">0</span>, <span class="number">2</span>),</span><br><span class="line">        <span class="string">'stock'</span> =&gt; (int)$sku[<span class="string">'stock'</span>],</span><br><span class="line">    ];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">unset</span>($sku);</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    $config = [</span><br><span class="line">        <span class="string">'host'</span> =&gt; <span class="string">'localhost'</span>,</span><br><span class="line">        <span class="string">'dbname'</span> =&gt; <span class="string">'test'</span>,</span><br><span class="line">        <span class="string">'username'</span> =&gt; <span class="string">'root'</span>,</span><br><span class="line">        <span class="string">'password'</span> =&gt; <span class="string">'root'</span>,</span><br><span class="line">    ];</span><br><span class="line">    $prefix = <span class="string">''</span>;</span><br><span class="line"></span><br><span class="line">    $conn = <span class="keyword">new</span> PDO(<span class="string">"mysql:host=&#123;$config['host']&#125;;dbname=&#123;$config['dbname']&#125;"</span>, $config[<span class="string">'username'</span>], $config[<span class="string">'password'</span>]);</span><br><span class="line">    $conn-&gt;setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);</span><br><span class="line">    <span class="comment">// 开启事务</span></span><br><span class="line">    $conn-&gt;beginTransaction();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 保存商品</span></span><br><span class="line">    $sth = $conn-&gt;prepare(<span class="string">"INSERT INTO &#123;$prefix&#125;goods(goods_title, generate_time) VALUES(:goodsTitle, :generateTime)"</span>);</span><br><span class="line">    $sth-&gt;execute([</span><br><span class="line">        <span class="string">':goodsTitle'</span> =&gt; <span class="string">'test'</span> . mt_rand(),</span><br><span class="line">        <span class="string">':generateTime'</span> =&gt; date(<span class="string">'Y-m-d H:i:s'</span>)</span><br><span class="line">    ]);</span><br><span class="line">    <span class="comment">// 商品ID</span></span><br><span class="line">    $goodsId = $conn-&gt;lastInsertId();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 商品规格项</span></span><br><span class="line">    $specValueArray = [];</span><br><span class="line">    <span class="comment">// 保存商品规格及规格项</span></span><br><span class="line">    <span class="keyword">foreach</span> ($specArray <span class="keyword">as</span> $specId =&gt; $specName) &#123;</span><br><span class="line">        <span class="comment">// 保存商品规格类型</span></span><br><span class="line">        $sth = $conn-&gt;prepare(<span class="string">"INSERT INTO &#123;$prefix&#125;goods_spec_type(goods_id, type_name) VALUES(:goodsId, :specName)"</span>);</span><br><span class="line">        $sth-&gt;execute([</span><br><span class="line">            <span class="string">':goodsId'</span> =&gt; $goodsId,</span><br><span class="line">            <span class="string">':specName'</span> =&gt; $specName,</span><br><span class="line">        ]);</span><br><span class="line">        <span class="comment">// 规格类型ID</span></span><br><span class="line">        $specTypeId = $conn-&gt;lastInsertId();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> ($specItemArray[$specId] <span class="keyword">as</span> $specValueId =&gt; $specValueName) &#123;</span><br><span class="line">            <span class="comment">// 保存商品规格项</span></span><br><span class="line">            $sth = $conn-&gt;prepare(<span class="string">"INSERT INTO &#123;$prefix&#125;goods_spec_value(goods_id, spec_type_id, value_name) VALUES(:goodsId, :specTypeId, :specValueName)"</span>);</span><br><span class="line">            $sth-&gt;execute([</span><br><span class="line">                <span class="string">':goodsId'</span> =&gt; $goodsId,</span><br><span class="line">                <span class="string">':specTypeId'</span> =&gt; $specTypeId,</span><br><span class="line">                <span class="string">':specValueName'</span> =&gt; $specValueName,</span><br><span class="line">            ]);</span><br><span class="line">            <span class="comment">// 规格项ID</span></span><br><span class="line">            $specTypeValueId = $conn-&gt;lastInsertId();</span><br><span class="line">            <span class="comment">// SKU信息</span></span><br><span class="line">            $specValueArray[$specValueId] = [</span><br><span class="line">                <span class="string">'specId'</span> =&gt; $specTypeId,</span><br><span class="line">                <span class="string">'specName'</span> =&gt; $specName,</span><br><span class="line">                <span class="string">'specValueId'</span> =&gt; $specTypeValueId,</span><br><span class="line">                <span class="string">'specValueName'</span> =&gt; $specValueName,</span><br><span class="line">            ];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 保存商品SKU</span></span><br><span class="line">    <span class="keyword">foreach</span> ($skuArray <span class="keyword">as</span> $specValueIds =&gt; $sku) &#123;</span><br><span class="line">        $specValueIdArray = explode(<span class="string">'_'</span>, $specValueIds);</span><br><span class="line">        $skuTitle = <span class="string">''</span>;</span><br><span class="line">        <span class="keyword">foreach</span> ($specValueIdArray <span class="keyword">as</span> $specValueId) &#123;</span><br><span class="line">            $skuTitle .= $specValueArray[$specValueId][<span class="string">'specName'</span>] . <span class="string">':'</span> . $specValueArray[$specValueId][<span class="string">'specValueName'</span>] . <span class="string">'  '</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 保存商品SKU信息</span></span><br><span class="line">        $sth = $conn-&gt;prepare(<span class="string">"INSERT INTO &#123;$prefix&#125;goods_sku(goods_id, title, price, stock) VALUES(:goodsId, :skuTitle, :skuPrice, :skuStock)"</span>);</span><br><span class="line">        $sth-&gt;execute([</span><br><span class="line">            <span class="string">':goodsId'</span> =&gt; $goodsId,</span><br><span class="line">            <span class="string">':skuTitle'</span> =&gt; $skuTitle,</span><br><span class="line">            <span class="string">':skuPrice'</span> =&gt; $sku[<span class="string">'price'</span>],</span><br><span class="line">            <span class="string">':skuStock'</span> =&gt; $sku[<span class="string">'stock'</span>]</span><br><span class="line">        ]);</span><br><span class="line">        <span class="comment">// SKU ID</span></span><br><span class="line">        $skuId = $conn-&gt;lastInsertId();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 保存商品SKU与规格关系</span></span><br><span class="line">        <span class="keyword">foreach</span> ($specValueIdArray <span class="keyword">as</span> $specValueId) &#123;</span><br><span class="line">            $specValue = $specValueArray[$specValueId];</span><br><span class="line">            $sth = $conn-&gt;prepare(<span class="string">"INSERT INTO &#123;$prefix&#125;goods_sku_serial(goods_id, goods_sku_id, goods_spec_type_id, goods_spec_type_name, goods_spec_value_id, goods_spec_value_name) VALUES(:goodsId, :skuId, :specTypeId, :specTypeName, :specValueId, :specValueName)"</span>);</span><br><span class="line">            $sth-&gt;execute([</span><br><span class="line">                <span class="string">':goodsId'</span> =&gt; $goodsId,</span><br><span class="line">                <span class="string">':skuId'</span> =&gt; $skuId,</span><br><span class="line">                <span class="string">':specTypeId'</span> =&gt; $specValue[<span class="string">'specId'</span>],</span><br><span class="line">                <span class="string">':specTypeName'</span> =&gt; $specValue[<span class="string">'specName'</span>],</span><br><span class="line">                <span class="string">':specValueId'</span> =&gt; $specValue[<span class="string">'specValueId'</span>],</span><br><span class="line">                <span class="string">':specValueName'</span> =&gt; $specValue[<span class="string">'specValueName'</span>],</span><br><span class="line">            ]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 提交事务</span></span><br><span class="line">    $conn-&gt;commit();</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="keyword">Exception</span> $e) &#123;</span><br><span class="line">    <span class="comment">// 事务回滚</span></span><br><span class="line">    <span class="keyword">isset</span>($conn) &amp;&amp; $conn-&gt;rollBack();</span><br><span class="line">    <span class="keyword">exit</span>(<span class="string">"ERROR: &#123;$e-&gt;getMessage()&#125;"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>Mr</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://sevming.github.io/PHP/goods-sku.html" title="PHP 商品SKU">http://sevming.github.io/PHP/goods-sku.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/php/" rel="tag"># php</a>
+          
+            <a href="/tags/sku/" rel="tag"># sku</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/MySQL/mysql-sql.html" rel="next" title="MySQL SQL 查询相关">
+                <i class="fa fa-chevron-left"></i> MySQL SQL 查询相关
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/PHP/algorithm.html" rel="prev" title="PHP 项目中常用算法">
+                PHP 项目中常用算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.png"
+                alt="Mr" />
+            
+              <p class="site-author-name" itemprop="name">Mr</p>
+              <p class="site-description motion-element" itemprop="description">懒........</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">102</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://novnan.github.io" title="Novnan" target="_blank">Novnan</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://zhengyongshun.com" title="挨踢Blog" target="_blank">挨踢Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://25550808.github.io" title="Eagle" target="_blank">Eagle</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://luscio.github.io" title="Timber" target="_blank">Timber</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://952425340.github.io" title="谢炳南" target="_blank">谢炳南</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#创建相关表"><span class="nav-number">1.</span> <span class="nav-text">创建相关表</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#前端代码"><span class="nav-number">2.</span> <span class="nav-text">前端代码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#服务端代码"><span class="nav-number">3.</span> <span class="nav-text">服务端代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mr</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.2"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#more");
+  
+  </script>
+
+
+</body>
+</html>

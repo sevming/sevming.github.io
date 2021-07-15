@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="php,beanstalkd," />
+
+
+<meta name="description" content="场景：订单超时事件、礼品券过期事件, 类似这些场景的, 都可以使用延迟队列来处理, 由于 beanstalkd 是单进程, 可以考虑结合 workerman 创建多进程来处理任务 文档地址https://www.kancloud.cn/vson/php-message-queue/891904 安装12345678wget https://github.com/beanstalkd/beansta">
+<meta name="keywords" content="php,beanstalkd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Beanstalkd 队列">
+<meta property="og:url" content="http://sevming.github.io/PHP/beanstalkd.html">
+<meta property="og:site_name" content="Mr.Blog">
+<meta property="og:description" content="场景：订单超时事件、礼品券过期事件, 类似这些场景的, 都可以使用延迟队列来处理, 由于 beanstalkd 是单进程, 可以考虑结合 workerman 创建多进程来处理任务 文档地址https://www.kancloud.cn/vson/php-message-queue/891904 安装12345678wget https://github.com/beanstalkd/beansta">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-07-15T04:00:35.447Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Beanstalkd 队列">
+<meta name="twitter:description" content="场景：订单超时事件、礼品券过期事件, 类似这些场景的, 都可以使用延迟队列来处理, 由于 beanstalkd 是单进程, 可以考虑结合 workerman 创建多进程来处理任务 文档地址https://www.kancloud.cn/vson/php-message-queue/891904 安装12345678wget https://github.com/beanstalkd/beansta">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Mr.Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://sevming.github.io/PHP/beanstalkd.html"/>
+
+
+  <title>Beanstalkd 队列 | Mr.Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr.Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+  
+  
+  
+    <a href="https://github.com/sevming" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sevming.github.io/PHP/beanstalkd.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mr">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr.Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Beanstalkd 队列</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-31T12:25:12+00:00">2019-08-31</time>
+            
+
+            
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                    <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于&#58;</span>
+                <time title="更新于" itemprop="dateModified" datetime="2020-07-02T15:53:00+00:00">2020-07-02</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/PHP/" itemprop="url" rel="index"><span itemprop="name">PHP</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <div class="note danger"><p>场景：订单超时事件、礼品券过期事件, 类似这些场景的, 都可以使用延迟队列来处理, 由于 beanstalkd 是单进程, 可以考虑结合 workerman 创建多进程来处理任务</p></div>
+<h5 id="文档地址"><a href="#文档地址" class="headerlink" title="文档地址"></a>文档地址</h5><p><a href="https://www.kancloud.cn/vson/php-message-queue/891904" target="_blank" rel="noopener">https://www.kancloud.cn/vson/php-message-queue/891904</a></p>
+<h5 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/beanstalkd/beanstalkd/archive/v1.11.tar.gz</span><br><span class="line">tar -zxvf v1.11.tar.gz</span><br><span class="line"><span class="built_in">cd</span> beanstalkd-1.11</span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"><span class="comment">#查看版本</span></span><br><span class="line">beanstalkd -v</span><br><span class="line"><span class="comment">#启动 - 若 127.0.0.1 设为 0.0.0.0, 则都可以连接</span></span><br><span class="line">beanstalkd -l 127.0.0.1 -p 11300 -b /data/beanstalkd/binlog &amp;</span><br></pre></td></tr></table></figure>
+<h5 id="相关工具"><a href="#相关工具" class="headerlink" title="相关工具"></a>相关工具</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># beanstalk CLI 工具</span></span><br><span class="line">wget https://github.com/src<span class="_">-d</span>/beanstool/releases/download/v0.2.0/beanstool_v0.2.0_linux_amd64.tar.gz</span><br><span class="line">tar -zxvf beanstool_v0.2.0_linux_amd64.tar.gz</span><br><span class="line"><span class="built_in">cd</span> beanstool_v0.2.0_linux_amd64/</span><br><span class="line">./beanstool stats</span><br><span class="line"></span><br><span class="line"><span class="comment"># beanstalkd 可视化界面</span></span><br><span class="line">wget https://github.com/xuri/aurora/releases/download/2.2/aurora_linux_amd64_v2.2.tar.gz</span><br><span class="line">tar -zxvf aurora_linux_amd64_v2.2.tar.gz</span><br><span class="line">./aurora</span><br><span class="line"><span class="comment">#需开放对应的端口,如果是搭建在虚拟机,主机需要访问时,需配置 aurora.toml, 配置 listen 的监听IP为虚拟机IP 即可, 切记, 配置的IP为 ip addr 命令下的IP, 如果是阿里云服务器, 配置的是私有IP, 访问的时候使用公网IP + 端口</span></span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h5 id="DEMO"><a href="#DEMO" class="headerlink" title="DEMO"></a>DEMO</h5><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># producer</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Pheanstalk</span>\<span class="title">Pheanstalk</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">require</span> <span class="string">'../vendor/autoload.php'</span>;</span><br><span class="line"></span><br><span class="line">$pheanstalk = Pheanstalk::create(<span class="string">'127.0.0.1'</span>, <span class="number">11300</span>);</span><br><span class="line"></span><br><span class="line">$tubeName = <span class="string">'test'</span>;</span><br><span class="line"><span class="keyword">for</span> ($i = <span class="number">1</span>; $i &lt;= <span class="number">10</span>; $i++) &#123;</span><br><span class="line">    $nowTime = date(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line">    $delay = mt_rand(<span class="number">1</span>, <span class="number">20</span>);</span><br><span class="line">    $job = [</span><br><span class="line">        <span class="string">'id'</span> =&gt; $i,</span><br><span class="line">        <span class="string">'delay'</span> =&gt; $delay,</span><br><span class="line">        <span class="string">'runTime'</span> =&gt; date(<span class="string">'Y-m-d H:i:s'</span>, strtotime($nowTime) + $delay),</span><br><span class="line">    ];</span><br><span class="line">    $pheanstalk-&gt;useTube($tubeName)</span><br><span class="line">        -&gt;put(json_encode($job), <span class="number">0</span>, $job[<span class="string">'delay'</span>]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># consumer</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Pheanstalk</span>\<span class="title">Pheanstalk</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">require</span> <span class="string">'../vendor/autoload.php'</span>;</span><br><span class="line"></span><br><span class="line">$worker = <span class="keyword">new</span> Worker();</span><br><span class="line">$worker-&gt;count = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">$pheanstalk = Pheanstalk::create(<span class="string">'127.0.0.1'</span>, <span class="number">11300</span>);</span><br><span class="line"></span><br><span class="line">$worker-&gt;onWorkerStart = <span class="function"><span class="keyword">function</span> <span class="params">($worker)</span> <span class="title">use</span> <span class="params">($pheanstalk)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        $tubeName = <span class="string">'test'</span>;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            $job = $pheanstalk-&gt;watch($tubeName)-&gt;ignore(<span class="string">'default'</span>)-&gt;reserve();</span><br><span class="line">            $data = json_decode($job-&gt;getData(), <span class="keyword">true</span>);</span><br><span class="line">            file_put_contents(<span class="string">'./test.log'</span>, <span class="string">"当前进程ID："</span> . posix_getpid() . <span class="string">", 任务ID：&#123;$data['id']&#125;, 任务预定时间：&#123;$data['runTime']&#125;, 当前时间："</span> . date(<span class="string">'Y-m-d H:i:s'</span>) . PHP_EOL, FILE_APPEND);</span><br><span class="line">            $pheanstalk-&gt;delete($job);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (<span class="keyword">Exception</span> $e) &#123;</span><br><span class="line">        print_r($e-&gt;getMessage());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Worker::runAll();</span><br></pre></td></tr></table></figure>
+<hr>
+<h5 id="Windows-安装-Beanstalkd"><a href="#Windows-安装-Beanstalkd" class="headerlink" title="Windows 安装 Beanstalkd"></a>Windows 安装 Beanstalkd</h5><ol>
+<li><p>下载并安装 <a href="http://www.cygwin.com/" target="_blank" rel="noopener">cygwin</a></p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 添加镜像地址 - http://mirrors.aliyun.com</span><br><span class="line">2. 下载 `gcc`、`gcc-core`、`make`、`automake`, 在 Devel 分支下</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>下载 <a href="https://github.com/caidongyun/beanstalkd-win" target="_blank" rel="noopener">beanstalkd-win</a> 包</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 解压并进入beanstalkd-win目录</span><br><span class="line">2. 打开CMD窗口,运行 ./beanstalkd.exe -l 127.0.0.1 -p 11300</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<!-- more -->
+<ol>
+<li><p><a href="https://github.com/mariuswilms/queue/tree/master/libs/beanstalk/src/Socket" target="_blank" rel="noopener">PHP Beanstalkd Service</a></p>
+ <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br><span class="line">488</span><br><span class="line">489</span><br><span class="line">490</span><br><span class="line">491</span><br><span class="line">492</span><br><span class="line">493</span><br><span class="line">494</span><br><span class="line">495</span><br><span class="line">496</span><br><span class="line">497</span><br><span class="line">498</span><br><span class="line">499</span><br><span class="line">500</span><br><span class="line">501</span><br><span class="line">502</span><br><span class="line">503</span><br><span class="line">504</span><br><span class="line">505</span><br><span class="line">506</span><br><span class="line">507</span><br><span class="line">508</span><br><span class="line">509</span><br><span class="line">510</span><br><span class="line">511</span><br><span class="line">512</span><br><span class="line">513</span><br><span class="line">514</span><br><span class="line">515</span><br><span class="line">516</span><br><span class="line">517</span><br><span class="line">518</span><br><span class="line">519</span><br><span class="line">520</span><br><span class="line">521</span><br><span class="line">522</span><br><span class="line">523</span><br><span class="line">524</span><br><span class="line">525</span><br><span class="line">526</span><br><span class="line">527</span><br><span class="line">528</span><br><span class="line">529</span><br><span class="line">530</span><br><span class="line">531</span><br><span class="line">532</span><br><span class="line">533</span><br><span class="line">534</span><br><span class="line">535</span><br><span class="line">536</span><br><span class="line">537</span><br><span class="line">538</span><br><span class="line">539</span><br><span class="line">540</span><br><span class="line">541</span><br><span class="line">542</span><br><span class="line">543</span><br><span class="line">544</span><br><span class="line">545</span><br><span class="line">546</span><br><span class="line">547</span><br><span class="line">548</span><br><span class="line">549</span><br><span class="line">550</span><br><span class="line">551</span><br><span class="line">552</span><br><span class="line">553</span><br><span class="line">554</span><br><span class="line">555</span><br><span class="line">556</span><br><span class="line">557</span><br><span class="line">558</span><br><span class="line">559</span><br><span class="line">560</span><br><span class="line">561</span><br><span class="line">562</span><br><span class="line">563</span><br><span class="line">564</span><br><span class="line">565</span><br><span class="line">566</span><br><span class="line">567</span><br><span class="line">568</span><br><span class="line">569</span><br><span class="line">570</span><br><span class="line">571</span><br><span class="line">572</span><br><span class="line">573</span><br><span class="line">574</span><br><span class="line">575</span><br><span class="line">576</span><br><span class="line">577</span><br><span class="line">578</span><br><span class="line">579</span><br><span class="line">580</span><br><span class="line">581</span><br><span class="line">582</span><br><span class="line">583</span><br><span class="line">584</span><br><span class="line">585</span><br><span class="line">586</span><br><span class="line">587</span><br><span class="line">588</span><br><span class="line">589</span><br><span class="line">590</span><br><span class="line">591</span><br><span class="line">592</span><br><span class="line">593</span><br><span class="line">594</span><br><span class="line">595</span><br><span class="line">596</span><br><span class="line">597</span><br><span class="line">598</span><br><span class="line">599</span><br><span class="line">600</span><br><span class="line">601</span><br><span class="line">602</span><br><span class="line">603</span><br><span class="line">604</span><br><span class="line">605</span><br><span class="line">606</span><br><span class="line">607</span><br><span class="line">608</span><br><span class="line">609</span><br><span class="line">610</span><br><span class="line">611</span><br><span class="line">612</span><br><span class="line">613</span><br><span class="line">614</span><br><span class="line">615</span><br><span class="line">616</span><br><span class="line">617</span><br><span class="line">618</span><br><span class="line">619</span><br><span class="line">620</span><br><span class="line">621</span><br><span class="line">622</span><br><span class="line">623</span><br><span class="line">624</span><br><span class="line">625</span><br><span class="line">626</span><br><span class="line">627</span><br><span class="line">628</span><br><span class="line">629</span><br><span class="line">630</span><br><span class="line">631</span><br><span class="line">632</span><br><span class="line">633</span><br><span class="line">634</span><br><span class="line">635</span><br><span class="line">636</span><br><span class="line">637</span><br><span class="line">638</span><br><span class="line">639</span><br><span class="line">640</span><br><span class="line">641</span><br><span class="line">642</span><br><span class="line">643</span><br><span class="line">644</span><br><span class="line">645</span><br><span class="line">646</span><br><span class="line">647</span><br><span class="line">648</span><br><span class="line">649</span><br><span class="line">650</span><br><span class="line">651</span><br><span class="line">652</span><br><span class="line">653</span><br><span class="line">654</span><br><span class="line">655</span><br><span class="line">656</span><br><span class="line">657</span><br><span class="line">658</span><br><span class="line">659</span><br><span class="line">660</span><br><span class="line">661</span><br><span class="line">662</span><br><span class="line">663</span><br><span class="line">664</span><br><span class="line">665</span><br><span class="line">666</span><br><span class="line">667</span><br><span class="line">668</span><br><span class="line">669</span><br><span class="line">670</span><br><span class="line">671</span><br><span class="line">672</span><br><span class="line">673</span><br><span class="line">674</span><br><span class="line">675</span><br><span class="line">676</span><br><span class="line">677</span><br><span class="line">678</span><br><span class="line">679</span><br><span class="line">680</span><br><span class="line">681</span><br><span class="line">682</span><br><span class="line">683</span><br><span class="line">684</span><br><span class="line">685</span><br><span class="line">686</span><br><span class="line">687</span><br><span class="line">688</span><br><span class="line">689</span><br><span class="line">690</span><br><span class="line">691</span><br><span class="line">692</span><br><span class="line">693</span><br><span class="line">694</span><br><span class="line">695</span><br><span class="line">696</span><br><span class="line">697</span><br><span class="line">698</span><br><span class="line">699</span><br><span class="line">700</span><br><span class="line">701</span><br><span class="line">702</span><br><span class="line">703</span><br><span class="line">704</span><br><span class="line">705</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* beanstalk: A minimalistic PHP beanstalk client.</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* Copyright (c) 2009-2013 David Persson</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* Distributed under the terms of the MIT License.</span></span><br><span class="line"><span class="comment">* Redistributions of files must retain the above copyright notice.</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* <span class="doctag">@copyright</span>  2009-2013 David Persson &lt;nperson<span class="doctag">@gmx</span>.de&gt;</span></span><br><span class="line"><span class="comment">* <span class="doctag">@license</span>    http://www.opensource.org/licenses/mit-license.php The MIT License</span></span><br><span class="line"><span class="comment">* <span class="doctag">@link</span>       http://github.com/davidpersson/beanstalk</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* An interface to the beanstalk queue service. Implements the beanstalk</span></span><br><span class="line"><span class="comment">* protocol spec 1.2. Where appropriate the documentation from the protcol has</span></span><br><span class="line"><span class="comment">* been added to the docblocks in this class.</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* <span class="doctag">@link</span> https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BeanstalkdService</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Holds a boolean indicating whether a connection to the server is</span></span><br><span class="line"><span class="comment">    * currently established or not.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@var</span> boolean</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> $connected = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Holds configuration values.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@var</span> array</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">protected</span> $_config = [];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * The current connection resource handle (if any).</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@var</span> resource</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">protected</span> $_connection;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Generated errors. Will hold a maximum of 200 error messages at any time</span></span><br><span class="line"><span class="comment">    * to prevent pilling up messages and using more and more memory. This is</span></span><br><span class="line"><span class="comment">    * especially important if this class is used in long-running workers.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@see</span> Socket_Beanstalk::errors()</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@see</span> Socket_Beanstalk::_error()</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@var</span> array</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">protected</span> $_errors = [];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Constructor.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> array $config     An array of configuration values:</span></span><br><span class="line"><span class="comment">    *                          - `'persistent'`  Whether to make the connection persistent or</span></span><br><span class="line"><span class="comment">    *                          not, defaults to `true` as the FAQ recommends</span></span><br><span class="line"><span class="comment">    *                          persistent connections.</span></span><br><span class="line"><span class="comment">    *                          - `'host'`        The beanstalk server hostname or IP address to</span></span><br><span class="line"><span class="comment">    *                          connect to, defaults to `127.0.0.1`.</span></span><br><span class="line"><span class="comment">    *                          - `'port'`        The port of the server to connect to, defaults</span></span><br><span class="line"><span class="comment">    *                          to `11300`.</span></span><br><span class="line"><span class="comment">    *                          - `'timeout'`     Timeout in seconds when establishing the</span></span><br><span class="line"><span class="comment">    *                          connection, defaults to `1`.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> void</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(array $config = [])</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $defaults = [</span><br><span class="line">            <span class="string">'persistent'</span> =&gt; <span class="keyword">true</span>,</span><br><span class="line">            <span class="string">'host'</span> =&gt; <span class="string">'127.0.0.1'</span>,</span><br><span class="line">            <span class="string">'port'</span> =&gt; <span class="number">11300</span>,</span><br><span class="line">            <span class="string">'timeout'</span> =&gt; <span class="number">1</span></span><br><span class="line">        ];</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_config = $config + $defaults;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Destructor, disconnects from the server.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> void</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;disconnect();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Initiates a socket connection to the beanstalk server. The resulting</span></span><br><span class="line"><span class="comment">    * stream will not have any timeout set on it. Which means it can wait an</span></span><br><span class="line"><span class="comment">    * unlimited amount of time until a packet becomes available. This is</span></span><br><span class="line"><span class="comment">    * required for doing blocking reads.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> boolean `true` if the connection was established, `false` otherwise.</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@see</span> Socket_Beanstalk::reserve()</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@see</span> Socket_Beanstalk::$_connection</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">connect</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;_connection)) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;disconnect();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $function = <span class="keyword">$this</span>-&gt;_config[<span class="string">'persistent'</span>] ? <span class="string">'pfsockopen'</span> : <span class="string">'fsockopen'</span>;</span><br><span class="line">        $errNum = <span class="keyword">null</span>;</span><br><span class="line">        $errStr = <span class="keyword">null</span>;</span><br><span class="line">        $params = [<span class="keyword">$this</span>-&gt;_config[<span class="string">'host'</span>], <span class="keyword">$this</span>-&gt;_config[<span class="string">'port'</span>], &amp;$errNum, &amp;$errStr];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;_config[<span class="string">'timeout'</span>]) &#123;</span><br><span class="line">            $params[] = <span class="keyword">$this</span>-&gt;_config[<span class="string">'timeout'</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_connection = @call_user_func_array($function, $params);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">empty</span>($errNum) || !<span class="keyword">empty</span>($errStr)) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;_error(<span class="string">"&#123;$errNum&#125;: &#123;$errStr&#125;"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">$this</span>-&gt;connected = is_resource(<span class="keyword">$this</span>-&gt;_connection);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;connected) &#123;</span><br><span class="line">            stream_set_timeout(<span class="keyword">$this</span>-&gt;_connection, <span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;connected;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Closes the connection to the beanstalk server.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> boolean `true` if diconnecting was successful.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">disconnect</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!is_resource(<span class="keyword">$this</span>-&gt;_connection)) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;connected = <span class="keyword">false</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;connected = !fclose(<span class="keyword">$this</span>-&gt;_connection);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!<span class="keyword">$this</span>-&gt;connected) &#123;</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_connection = <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> !<span class="keyword">$this</span>-&gt;connected;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Returns collected error messages.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> array An array of error messages.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">errors</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;_errors;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Pushes an error message to `Beanstalk::$_errors`. Ensures</span></span><br><span class="line"><span class="comment">    * that at any point there are not more than 200 messages.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> string $message The error message.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> void</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">_error</span><span class="params">($message)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (count(<span class="keyword">$this</span>-&gt;_errors) &gt;= <span class="number">200</span>) &#123;</span><br><span class="line">            array_shift(<span class="keyword">$this</span>-&gt;_errors);</span><br><span class="line">        &#125;</span><br><span class="line">        array_push(<span class="keyword">$this</span>-&gt;_errors, $message);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Writes a packet to the socket. Prior to writing to the socket will check</span></span><br><span class="line"><span class="comment">    * for availability of the connection.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> string $data</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> integer|boolean number of written bytes or `false` on error.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">_write</span><span class="params">($data)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">$this</span>-&gt;connected &amp;&amp; !<span class="keyword">$this</span>-&gt;connect()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $data .= <span class="string">"\r\n"</span>;</span><br><span class="line">        <span class="keyword">return</span> fwrite(<span class="keyword">$this</span>-&gt;_connection, $data, strlen($data));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Reads a packet from the socket. Prior to reading from the socket will</span></span><br><span class="line"><span class="comment">    * check for availability of the connection.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> int $length Number of bytes to read.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean Data or `false` on error.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">_read</span><span class="params">($length = null)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">$this</span>-&gt;connected &amp;&amp; !<span class="keyword">$this</span>-&gt;connect()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> ($length) &#123;</span><br><span class="line">            <span class="keyword">if</span> (feof(<span class="keyword">$this</span>-&gt;_connection)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            $data = stream_get_contents(<span class="keyword">$this</span>-&gt;_connection, $length + <span class="number">2</span>);</span><br><span class="line">            $meta = stream_get_meta_data(<span class="keyword">$this</span>-&gt;_connection);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> ($meta[<span class="string">'timed_out'</span>]) &#123;</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error(<span class="string">'Connection timed out.'</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            $packet = rtrim($data, <span class="string">"\r\n"</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            $packet = stream_get_line(<span class="keyword">$this</span>-&gt;_connection, <span class="number">16384</span>, <span class="string">"\r\n"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> $packet;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Producer Commands */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * The `put` command is for any process that wants to insert a job into the queue.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $pri   Jobs with smaller priority values will be scheduled</span></span><br><span class="line"><span class="comment">    *                       before jobs with larger priorities. The most urgent priority is</span></span><br><span class="line"><span class="comment">    *                       0; the least urgent priority is 4294967295.</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $delay Seconds to wait before putting the job in the</span></span><br><span class="line"><span class="comment">    *                       ready queue.  The job will be in the "delayed" state during this time.</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $ttr   Time to run - Number of seconds to allow a worker to</span></span><br><span class="line"><span class="comment">    *                       run this job.  The minimum ttr is 1.</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> string  $data  The job body.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> integer|boolean `false` on error otherwise an integer indicating</span></span><br><span class="line"><span class="comment">    *         the job id.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">put</span><span class="params">($pri, $delay, $ttr, $data)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">"put %d %d %d %d\r\n%s"</span>, $pri, $delay, $ttr, strlen($data), $data));</span><br><span class="line">        $status = strtok(<span class="keyword">$this</span>-&gt;_read(), <span class="string">' '</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'INSERTED'</span>:</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'BURIED'</span>:</span><br><span class="line">                <span class="keyword">return</span> (integer)strtok(<span class="string">' '</span>); <span class="comment">// job id</span></span><br><span class="line">            <span class="keyword">case</span> <span class="string">'EXPECTED_CRLF'</span>:</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'JOB_TOO_BIG'</span>:</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * The `use` command is for producers. Subsequent put commands will put jobs into</span></span><br><span class="line"><span class="comment">    * the tube specified by this command. If no use command has been issued, jobs</span></span><br><span class="line"><span class="comment">    * will be put into the tube named `default`.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * Please note that while obviously this method should better be named</span></span><br><span class="line"><span class="comment">    * `use` it is not. This is because `use` is a reserved keyword in PHP.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> string $tube A name at most 200 bytes. It specifies the tube to</span></span><br><span class="line"><span class="comment">    *                     use.  If the tube does not exist, it will be created.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean `false` on error otherwise the name of the tube.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">choose</span><span class="params">($tube)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">'use %s'</span>, $tube));</span><br><span class="line">        $status = strtok(<span class="keyword">$this</span>-&gt;_read(), <span class="string">' '</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'USING'</span>:</span><br><span class="line">                <span class="keyword">return</span> strtok(<span class="string">' '</span>);</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Alias for choose.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> string $tube</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@see</span> Socket_Beanstalk::choose()</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">useTube</span><span class="params">($tube)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;choose($tube);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Worker Commands */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Reserve a job (with a timeout)</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $timeout If given specifies number of seconds to wait for</span></span><br><span class="line"><span class="comment">    *                         a job. 0 returns immediately.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> array|false `false` on error otherwise an array holding job id</span></span><br><span class="line"><span class="comment">    *         and body.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">reserve</span><span class="params">($timeout = null)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">isset</span>($timeout)) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">'reserve-with-timeout %d'</span>, $timeout));</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;_write(<span class="string">'reserve'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        $status = strtok(<span class="keyword">$this</span>-&gt;_read(), <span class="string">' '</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'RESERVED'</span>:</span><br><span class="line">                <span class="keyword">return</span> [</span><br><span class="line">                    <span class="string">'id'</span> =&gt; (integer)strtok(<span class="string">' '</span>),</span><br><span class="line">                    <span class="string">'body'</span> =&gt; <span class="keyword">$this</span>-&gt;_read((integer)strtok(<span class="string">' '</span>))</span><br><span class="line">                ];</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'DEADLINE_SOON'</span>:</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'TIMED_OUT'</span>:</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Removes a job from the server entirely.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $id The id of the job.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> boolean `false` on error, `true` on success.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">delete</span><span class="params">($id)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">'delete %d'</span>, $id));</span><br><span class="line">        $status = <span class="keyword">$this</span>-&gt;_read();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'DELETED'</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'NOT_FOUND'</span>:</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Puts a reserved job back into the ready queue.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $id    The id of the job.</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $pri   Priority to assign to the job.</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $delay Number of seconds to wait before putting the job in the ready queue.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> boolean `false` on error, `true` on success.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">release</span><span class="params">($id, $pri, $delay)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">'release %d %d %d'</span>, $id, $pri, $delay));</span><br><span class="line">        $status = <span class="keyword">$this</span>-&gt;_read();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'RELEASED'</span>:</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'BURIED'</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'NOT_FOUND'</span>:</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Puts a job into the `buried` state Buried jobs are put into a FIFO</span></span><br><span class="line"><span class="comment">    * linked list and will not be touched until a client kicks them.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $id  The id of the job.</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $pri *New* priority to assign to the job.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> boolean `false` on error, `true` on success.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">bury</span><span class="params">($id, $pri)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">'bury %d %d'</span>, $id, $pri));</span><br><span class="line">        $status = <span class="keyword">$this</span>-&gt;_read();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'BURIED'</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'NOT_FOUND'</span>:</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Allows a worker to request more time to work on a job</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $id The id of the job.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> boolean `false` on error, `true` on success.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">touch</span><span class="params">($id)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">'touch %d'</span>, $id));</span><br><span class="line">        $status = <span class="keyword">$this</span>-&gt;_read();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'TOUCHED'</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'NOT_TOUCHED'</span>:</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Adds the named tube to the watch list for the current</span></span><br><span class="line"><span class="comment">    * connection.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> string $tube Name of tube to watch.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> integer|boolean `false` on error otherwise number of tubes in watch list.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">watch</span><span class="params">($tube)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">'watch %s'</span>, $tube));</span><br><span class="line">        $status = strtok(<span class="keyword">$this</span>-&gt;_read(), <span class="string">' '</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'WATCHING'</span>:</span><br><span class="line">                <span class="keyword">return</span> (integer)strtok(<span class="string">' '</span>);</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Remove the named tube from the watch list.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> string $tube Name of tube to ignore.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> integer|boolean `false` on error otherwise number of tubes in watch list.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">ignore</span><span class="params">($tube)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">'ignore %s'</span>, $tube));</span><br><span class="line">        $status = strtok(<span class="keyword">$this</span>-&gt;_read(), <span class="string">' '</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'WATCHING'</span>:</span><br><span class="line">                <span class="keyword">return</span> (integer)strtok(<span class="string">' '</span>);</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'NOT_IGNORED'</span>:</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Other Commands */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Inspect a job by its id.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $id The id of the job.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean `false` on error otherwise the body of the job.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">peek</span><span class="params">($id)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">'peek %d'</span>, $id));</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;_peekRead();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Inspect the next ready job.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean `false` on error otherwise the body of the job.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">peekReady</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(<span class="string">'peek-ready'</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;_peekRead();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Inspect the job with the shortest delay left.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean `false` on error otherwise the body of the job.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">peekDelayed</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(<span class="string">'peek-delayed'</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;_peekRead();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Inspect the next job in the list of buried jobs.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean `false` on error otherwise the body of the job.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">peekBuried</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(<span class="string">'peek-buried'</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;_peekRead();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Handles response for all peek methods.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean|array `false` on error otherwise the body of the job.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">_peekRead</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $status = strtok(<span class="keyword">$this</span>-&gt;_read(), <span class="string">' '</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'FOUND'</span>:</span><br><span class="line">                <span class="keyword">return</span> [</span><br><span class="line">                    <span class="string">'id'</span> =&gt; (integer)strtok(<span class="string">' '</span>),</span><br><span class="line">                    <span class="string">'body'</span> =&gt; <span class="keyword">$this</span>-&gt;_read((integer)strtok(<span class="string">' '</span>))</span><br><span class="line">                ];</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'NOT_FOUND'</span>:</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Moves jobs into the ready queue (applies to the current tube).</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * If there are buried jobs those get kicked only otherwise</span></span><br><span class="line"><span class="comment">    * delayed jobs get kicked.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $bound Upper bound on the number of jobs to kick.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> integer|boolean False on error otherwise number of job kicked.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">kick</span><span class="params">($bound)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">'kick %d'</span>, $bound));</span><br><span class="line">        $status = strtok(<span class="keyword">$this</span>-&gt;_read(), <span class="string">' '</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'KICKED'</span>:</span><br><span class="line">                <span class="keyword">return</span> (integer)strtok(<span class="string">' '</span>);</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Stats Commands */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Gives statistical information about the specified job if it exists.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> integer $id The job id</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean `false` on error otherwise a string with a yaml formatted dictionary</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">statsJob</span><span class="params">($id)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">'stats-job %d'</span>, $id));</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;_statsRead();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Gives statistical information about the specified tube if it exists.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> string $tube Name of the tube.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean `false` on error otherwise a string with a yaml formatted dictionary.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">statsTube</span><span class="params">($tube)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(sprintf(<span class="string">'stats-tube %s'</span>, $tube));</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;_statsRead();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Gives statistical information about the system as a whole.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean `false` on error otherwise a string with a yaml formatted dictionary.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">stats</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(<span class="string">'stats'</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;_statsRead();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Returns a list of all existing tubes.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean `false` on error otherwise a string with a yaml formatted list.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">listTubes</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(<span class="string">'list-tubes'</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;_statsRead();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Returns the tube currently being used by the producer.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean `false` on error otherwise a string with the name of the tube.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">listTubeUsed</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(<span class="string">'list-tube-used'</span>);</span><br><span class="line">        $status = strtok(<span class="keyword">$this</span>-&gt;_read(), <span class="string">' '</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'USING'</span>:</span><br><span class="line">                <span class="keyword">return</span> strtok(<span class="string">' '</span>);</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Alias for listTubeUsed.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean `false` on error otherwise a string with the name of the tube.</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@see</span> Socket_Beanstalk::listTubeUsed()</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">listTubeChosen</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;listTubeUsed();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Returns a list of tubes currently being watched by the worker.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> string|boolean `false` on error otherwise a string with a yaml formatted list.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">listTubesWatched</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;_write(<span class="string">'list-tubes-watched'</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;_statsRead();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Handles responses for all stat methods.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> boolean $decode Whether to decode data before returning it or not. Default is `true`.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> array|string|boolean `false` on error otherwise statistical data.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">_statsRead</span><span class="params">($decode = true)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $status = strtok(<span class="keyword">$this</span>-&gt;_read(), <span class="string">' '</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> ($status) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'OK'</span>:</span><br><span class="line">                $data = <span class="keyword">$this</span>-&gt;_read((integer)strtok(<span class="string">' '</span>));</span><br><span class="line">                <span class="keyword">return</span> $decode ? <span class="keyword">$this</span>-&gt;_decode($data) : $data;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">$this</span>-&gt;_error($status);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * Decodes YAML data. This is a super naive decoder which just works on a</span></span><br><span class="line"><span class="comment">    * subset of YAML which is commonly returned by beanstalk.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> string $data The data in YAML format, can be either a list or a dictionary.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> array An (associative) array of the converted data.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">_decode</span><span class="params">($data)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $data = array_slice(explode(<span class="string">"\n"</span>, $data), <span class="number">1</span>);</span><br><span class="line">        $result = [];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> ($data <span class="keyword">as</span> $key =&gt; $value) &#123;</span><br><span class="line">            <span class="keyword">if</span> ($value[<span class="number">0</span>] === <span class="string">'-'</span>) &#123;</span><br><span class="line">                $value = ltrim($value, <span class="string">'- '</span>);</span><br><span class="line">            &#125; <span class="keyword">elseif</span> (strpos($value, <span class="string">':'</span>) !== <span class="keyword">false</span>) &#123;</span><br><span class="line">                <span class="keyword">list</span>($key, $value) = explode(<span class="string">':'</span>, $value);</span><br><span class="line">                $value = ltrim($value, <span class="string">' '</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (is_numeric($value)) &#123;</span><br><span class="line">                $value = (integer)$value == $value ? (integer)$value : (float)$value;</span><br><span class="line">            &#125;</span><br><span class="line">            $result[$key] = $value;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> $result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用方法</p>
+ <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">require</span> <span class="string">'BeanstalkdService.php'</span>;</span><br><span class="line"></span><br><span class="line">$beanstalk = <span class="keyword">new</span> BeanstalkdService([</span><br><span class="line">    <span class="string">'persistent'</span> =&gt; <span class="keyword">false</span>,  <span class="comment">// 是否长连接</span></span><br><span class="line">    <span class="string">'host'</span> =&gt; <span class="string">'127.0.0.1'</span>,</span><br><span class="line">    <span class="string">'port'</span> =&gt; <span class="number">11300</span>,        <span class="comment">// 端口号默认11300</span></span><br><span class="line">    <span class="string">'timeout'</span> =&gt; <span class="number">3</span>          <span class="comment">// 连接超时时间</span></span><br><span class="line">]);</span><br><span class="line"><span class="comment">// 判断beanstalk是否已连接</span></span><br><span class="line"><span class="keyword">if</span> (!$beanstalk-&gt;connect()) &#123;</span><br><span class="line">    <span class="keyword">exit</span>(current($beanstalk-&gt;errors()));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用test这个tube</span></span><br><span class="line"><span class="comment">//$beanstalk-&gt;useTube('test');</span></span><br><span class="line"><span class="comment">//// 往tube增加数据</span></span><br><span class="line"><span class="comment">//// 参数意义:10表示任务的优先级,0不等待直接放到ready队列中,60处理job的超时时间,job内容</span></span><br><span class="line"><span class="comment">//$put = $beanstalk-&gt;put(10, 0, 60, 'test');</span></span><br><span class="line"><span class="comment">//if (!$put) &#123;</span></span><br><span class="line"><span class="comment">//    exit('commit job fail');</span></span><br><span class="line"><span class="comment">//&#125; else &#123;</span></span><br><span class="line"><span class="comment">//    var_dump($put);</span></span><br><span class="line"><span class="comment">//&#125;</span></span><br><span class="line"></span><br><span class="line">set_time_limit(<span class="number">0</span>);</span><br><span class="line">$beanstalk-&gt;watch(<span class="string">'test'</span>);</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        $job = $beanstalk-&gt;reserve();</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">empty</span>($job)) &#123;</span><br><span class="line">            $beanstalk-&gt;delete($job[<span class="string">'id'</span>]);</span><br><span class="line">            file_put_contents(<span class="string">'D:/test.txt'</span>, json_encode($job) . PHP_EOL, FILE_APPEND);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">catch</span> (<span class="keyword">Exception</span> $e) &#123;</span><br><span class="line">    $beanstalk-&gt;disconnect();</span><br><span class="line">    <span class="keyword">exit</span>($e-&gt;getMessage());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>Mr</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://sevming.github.io/PHP/beanstalkd.html" title="Beanstalkd 队列">http://sevming.github.io/PHP/beanstalkd.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/php/" rel="tag"># php</a>
+          
+            <a href="/tags/beanstalkd/" rel="tag"># beanstalkd</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/Aliyun/video-snapshot.html" rel="next" title="阿里云OSS 视频截帧、媒体管理(提交截图作业)">
+                <i class="fa fa-chevron-left"></i> 阿里云OSS 视频截帧、媒体管理(提交截图作业)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/Mac/mamp-install-php-ext.html" rel="prev" title="MAMP 安装 PHP SSH2 扩展">
+                MAMP 安装 PHP SSH2 扩展 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.png"
+                alt="Mr" />
+            
+              <p class="site-author-name" itemprop="name">Mr</p>
+              <p class="site-description motion-element" itemprop="description">懒........</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">102</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://novnan.github.io" title="Novnan" target="_blank">Novnan</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://zhengyongshun.com" title="挨踢Blog" target="_blank">挨踢Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://25550808.github.io" title="Eagle" target="_blank">Eagle</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://luscio.github.io" title="Timber" target="_blank">Timber</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://952425340.github.io" title="谢炳南" target="_blank">谢炳南</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#文档地址"><span class="nav-number">1.</span> <span class="nav-text">文档地址</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#安装"><span class="nav-number">2.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#相关工具"><span class="nav-number">3.</span> <span class="nav-text">相关工具</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#DEMO"><span class="nav-number">4.</span> <span class="nav-text">DEMO</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Windows-安装-Beanstalkd"><span class="nav-number">5.</span> <span class="nav-text">Windows 安装 Beanstalkd</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mr</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.2"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#more");
+  
+  </script>
+
+
+</body>
+</html>

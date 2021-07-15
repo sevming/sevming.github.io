@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Mr.Blog</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://sevming.github.io/"/>
+  <updated>2021-07-15T07:03:12.184Z</updated>
+  <id>http://sevming.github.io/</id>
+  
+  <author>
+    <name>Mr</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>GitLab CI 自动化部署</title>
+    <link href="http://sevming.github.io/Other/gitlab-ci-automatic-deploy.html"/>
+    <id>http://sevming.github.io/Other/gitlab-ci-automatic-deploy.html</id>
+    <published>2021-07-13T15:02:17.000Z</published>
+    <updated>2021-07-15T07:03:12.184Z</updated>
+    
+    <summary type="html">
+    
+      &lt;div class=&quot;note danger&quot;&gt;&lt;p&gt;在项目根目录下添加 .gitlab-ci.yml 文件，并将 GitLab 项目配置为使用 Runner，则每次提交或推送都会触发 CI pipeline.&lt;br&gt;&lt;a href=&quot;https://docs.gitlab.com/ee/ci/quick_start/index.html&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;点击查看官方文档&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;
+&lt;hr&gt;
+&lt;div class=&quot;note primary&quot;&gt;&lt;p&gt;GitLab-Runner&lt;/p&gt;&lt;/div&gt;
+&lt;blockquote&gt;&lt;p&gt;安装&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# Mac&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;brea install gitlab-runner&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 登录后启动（后台运行）&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;brew services start gitlab-runner&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 其它环境&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;https://docs.gitlab.com/runner/install/&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+      <category term="Other" scheme="http://sevming.github.io/categories/Other/"/>
+    
+    
+      <category term="gitlab" scheme="http://sevming.github.io/tags/gitlab/"/>
+    
+      <category term="deploy" scheme="http://sevming.github.io/tags/deploy/"/>
+    
+      <category term="runner" scheme="http://sevming.github.io/tags/runner/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>NodeJs &amp; Npm</title>
+    <link href="http://sevming.github.io/NodeJs/nodejs-npm.html"/>
+    <id>http://sevming.github.io/NodeJs/nodejs-npm.html</id>
+    <published>2021-07-13T14:20:00.000Z</published>
+    <updated>2021-07-15T04:00:35.445Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;div class=&quot;note danger&quot;&gt;&lt;p&gt;Node.js 基于 Chrome V8 引擎的 JavaScript 运行环境&lt;/p&gt;&lt;/div&gt;
+&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span
+        
+      
+    
+    </summary>
+    
+      <category term="NodeJs" scheme="http://sevming.github.io/categories/NodeJs/"/>
+    
+    
+      <category term="nodejs" scheme="http://sevming.github.io/tags/nodejs/"/>
+    
+      <category term="npm" scheme="http://sevming.github.io/tags/npm/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Mac 常用软件</title>
+    <link href="http://sevming.github.io/Mac/mac-common-software.html"/>
+    <id>http://sevming.github.io/Mac/mac-common-software.html</id>
+    <published>2021-07-13T10:50:49.000Z</published>
+    <updated>2021-07-15T04:00:35.443Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;div class=&quot;note danger&quot;&gt;&lt;p&gt;Homebrew&lt;/p&gt;&lt;/div&gt;
+&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span
+        
+      
+    
+    </summary>
+    
+      <category term="Mac" scheme="http://sevming.github.io/categories/Mac/"/>
+    
+    
+      <category term="mac" scheme="http://sevming.github.io/tags/mac/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Mac 下 Homebrew 搭建 PHP 开发环境</title>
+    <link href="http://sevming.github.io/Mac/mac-homebrew-php.html"/>
+    <id>http://sevming.github.io/Mac/mac-homebrew-php.html</id>
+    <published>2021-07-13T10:30:15.000Z</published>
+    <updated>2021-07-15T04:00:35.443Z</updated>
+    
+    <summary type="html">
+    
+      &lt;div class=&quot;note danger&quot;&gt;&lt;p&gt;PHP&lt;/p&gt;&lt;/div&gt;
+&lt;blockquote&gt;&lt;p&gt;安装&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;brew install php&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 启动&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;brew services start php@7.4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 重启&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;brew services restart php@7.4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 查看安装好的php路径&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;brew --prefix php@7.4&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;blockquote&gt;&lt;p&gt;配置&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 配置 /usr/local/etc/php/7.4/php-fpm.conf&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;pid = /usr/&lt;span class=&quot;built_in&quot;&gt;local&lt;/span&gt;/var/run/php74-fpm.pid&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;error_log = /Users/sev/Development/logs/php74-fpm.log&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;vim ~/.bash_profile&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;built_in&quot;&gt;export&lt;/span&gt; PATH=&lt;span class=&quot;string&quot;&gt;&quot;/usr/local/opt/php@7.4/bin:&lt;span class=&quot;variable&quot;&gt;$PATH&lt;/span&gt;&quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;built_in&quot;&gt;export&lt;/span&gt; PATH=&lt;span class=&quot;string&quot;&gt;&quot;/usr/local/opt/php@7.4/sbin:&lt;span class=&quot;variable&quot;&gt;$PATH&lt;/span&gt;&quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;built_in&quot;&gt;export&lt;/span&gt; LDFLAGS=&lt;span class=&quot;string&quot;&gt;&quot;-L/usr/local/opt/php@7.4/lib&quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;built_in&quot;&gt;export&lt;/span&gt; CPPFLAGS=&lt;span class=&quot;string&quot;&gt;&quot;-I/usr/local/opt/php@7.4/include&quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 注意：source ~/.bash_profile, 关闭窗口后就失效, 配置打开终端就生效&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;vim ~/.zshrc&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 在文件尾部添加一行&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;built_in&quot;&gt;source&lt;/span&gt; ~/.bash_profile&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+      <category term="Mac" scheme="http://sevming.github.io/categories/Mac/"/>
+    
+    
+      <category term="php" scheme="http://sevming.github.io/tags/php/"/>
+    
+      <category term="mac" scheme="http://sevming.github.io/tags/mac/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Mac 配置</title>
+    <link href="http://sevming.github.io/Mac/mac-configuration.html"/>
+    <id>http://sevming.github.io/Mac/mac-configuration.html</id>
+    <published>2021-07-13T10:27:00.000Z</published>
+    <updated>2021-07-15T04:00:35.443Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;div class=&quot;note danger&quot;&gt;&lt;p&gt;开启/关闭允许安装 “任何来源” 的软件&lt;/p&gt;&lt;/div&gt;
+&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span
+        
+      
+    
+    </summary>
+    
+      <category term="Mac" scheme="http://sevming.github.io/categories/Mac/"/>
+    
+    
+      <category term="mac" scheme="http://sevming.github.io/tags/mac/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Laravel Doctrine</title>
+    <link href="http://sevming.github.io/Laravel/laravel-doctrine.html"/>
+    <id>http://sevming.github.io/Laravel/laravel-doctrine.html</id>
+    <published>2021-07-12T16:36:00.000Z</published>
+    <updated>2021-07-15T04:00:35.442Z</updated>
+    
+    <summary type="html">
+    
+      &lt;div class=&quot;note danger&quot;&gt;&lt;p&gt;Laravel8.x 安装 laravel-doctrine/orm&lt;/p&gt;&lt;/div&gt;
+&lt;h4 id=&quot;安装&quot;&gt;&lt;a href=&quot;#安装&quot; class=&quot;headerlink&quot; title=&quot;安装&quot;&gt;&lt;/a&gt;安装&lt;/h4&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 降低相关包版本，以便安装 laravel-doctrine/orm&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;composer require doctrine/dbal:&lt;span class=&quot;string&quot;&gt;&quot;^2.6&quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;composer require doctrine/inflector:&lt;span class=&quot;string&quot;&gt;&quot;^1.4&quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;composer require laravel-doctrine/orm:&lt;span class=&quot;string&quot;&gt;&quot;~1.7&quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 发布配置文件&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;php artisan vendor:publish --tag=&lt;span class=&quot;string&quot;&gt;&quot;config&quot;&lt;/span&gt; --provider=&lt;span class=&quot;string&quot;&gt;&quot;LaravelDoctrine\ORM\DoctrineServiceProvider&quot;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;h4 id=&quot;生成元数据和实休&quot;&gt;&lt;a href=&quot;#生成元数据和实休&quot; class=&quot;headerlink&quot; title=&quot;生成元数据和实休&quot;&gt;&lt;/a&gt;生成元数据和实休&lt;/h4&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 生成元数据&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;php artisan doctrine:mapping:import --namespace=App\\Entities\\ xml database/mappings&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 配置 doctrine.php&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;string&quot;&gt;&#39;meta&#39;&lt;/span&gt; =&amp;gt; env(&lt;span class=&quot;string&quot;&gt;&#39;DOCTRINE_METADATA&#39;&lt;/span&gt;, &lt;span class=&quot;string&quot;&gt;&#39;xml&#39;&lt;/span&gt;),&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;string&quot;&gt;&#39;paths&#39;&lt;/span&gt; =&amp;gt; [base_path(&lt;span class=&quot;string&quot;&gt;&#39;database/mappings&#39;&lt;/span&gt;)],&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 生成实体&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;php artisan doctrine:generate:entities / --generate-methods&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# 需注意一点，如果 meta =&amp;gt; env(&#39;DOCTRINE_METADATA&#39;, &#39;annotations&#39;), 则生成实体时，命名必须包含 --generate-annotations&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;php artisan doctrine:generate:entities / --generate-methods --generate-annotations&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+      <category term="Laravel" scheme="http://sevming.github.io/categories/Laravel/"/>
+    
+    
+      <category term="php" scheme="http://sevming.github.io/tags/php/"/>
+    
+      <category term="laravel" scheme="http://sevming.github.io/tags/laravel/"/>
+    
+      <category term="doctrine" scheme="http://sevming.github.io/tags/doctrine/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Git 常用命令</title>
+    <link href="http://sevming.github.io/Git/git-commands.html"/>
+    <id>http://sevming.github.io/Git/git-commands.html</id>
+    <published>2021-07-12T16:30:00.000Z</published>
+    <updated>2021-07-15T04:00:35.441Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;div class=&quot;note danger&quot;&gt;&lt;p&gt;删除 git branch -a 中不存在的远程分支&lt;/p&gt;&lt;/div&gt;
+&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span
+        
+      
+    
+    </summary>
+    
+      <category term="Git" scheme="http://sevming.github.io/categories/Git/"/>
+    
+    
+      <category term="git" scheme="http://sevming.github.io/tags/git/"/>
+    
+  </entry>
+  
+</feed>

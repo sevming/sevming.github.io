@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="php," />
+
+
+<meta name="description" content="基本要求  以标准计算机英文为蓝本,杜绝一切拼音、或拼音英文混杂的命名方式 纯PHP代码源文件只使用 &amp;lt;?php 标签,省略关闭标签 ?&amp;gt; 源文件中PHP代码的编码格式必须是无BOM的UTF-8格式 一个源文件只做一种类型的声明,即这个文件专门用来声明Class,那个文件专门用来设置配置信息,别混在一起写 使用Tab键来缩进,每个Tab键长度设置为4个空格 一行推荐的是最多写120个字">
+<meta name="keywords" content="php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP 代码规范">
+<meta property="og:url" content="http://sevming.github.io/PHP/coding-standards.html">
+<meta property="og:site_name" content="Mr.Blog">
+<meta property="og:description" content="基本要求  以标准计算机英文为蓝本,杜绝一切拼音、或拼音英文混杂的命名方式 纯PHP代码源文件只使用 &amp;lt;?php 标签,省略关闭标签 ?&amp;gt; 源文件中PHP代码的编码格式必须是无BOM的UTF-8格式 一个源文件只做一种类型的声明,即这个文件专门用来声明Class,那个文件专门用来设置配置信息,别混在一起写 使用Tab键来缩进,每个Tab键长度设置为4个空格 一行推荐的是最多写120个字">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-07-15T04:00:35.447Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP 代码规范">
+<meta name="twitter:description" content="基本要求  以标准计算机英文为蓝本,杜绝一切拼音、或拼音英文混杂的命名方式 纯PHP代码源文件只使用 &amp;lt;?php 标签,省略关闭标签 ?&amp;gt; 源文件中PHP代码的编码格式必须是无BOM的UTF-8格式 一个源文件只做一种类型的声明,即这个文件专门用来声明Class,那个文件专门用来设置配置信息,别混在一起写 使用Tab键来缩进,每个Tab键长度设置为4个空格 一行推荐的是最多写120个字">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Mr.Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://sevming.github.io/PHP/coding-standards.html"/>
+
+
+  <title>PHP 代码规范 | Mr.Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr.Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+  
+  
+  
+    <a href="https://github.com/sevming" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sevming.github.io/PHP/coding-standards.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mr">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr.Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PHP 代码规范</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-03T09:41:26+00:00">2018-02-03</time>
+            
+
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/PHP/" itemprop="url" rel="index"><span itemprop="name">PHP</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <div class="note danger"><p>基本要求</p></div>
+<ol>
+<li>以标准计算机英文为蓝本,杜绝一切拼音、或拼音英文混杂的命名方式</li>
+<li>纯PHP代码源文件只使用 <font color="red">&lt;?php</font> 标签,省略关闭标签 <font color="red">?&gt;</font></li>
+<li>源文件中PHP代码的编码格式必须是无BOM的UTF-8格式</li>
+<li>一个源文件只做一种类型的声明,即这个文件专门用来声明Class,那个文件专门用来设置配置信息,别混在一起写</li>
+<li>使用Tab键来缩进,每个Tab键长度设置为4个空格</li>
+<li>一行推荐的是最多写120个字符,多于这个字符就应该换行了</li>
+<li>关键字必须小写,boolean值：true,false,null 也必须小写</li>
+<li>涉及到多个数据表 更新/添加 操作时,最外层要用事务,保证数据库操作的原子性</li>
+<li>Model层,只做简单的数据表的查询</li>
+<li>业务逻辑统一封装到 Logic层</li>
+<li>控制器只做URL路由,不要当作 业务方法 调用,不能出现SQL操作语句</li>
+</ol>
+<a id="more"></a>
+<div class="note danger"><p>命名规范</p></div>
+<ol>
+<li>变量命名,采用驼峰式写法,以大写字母作为单词的分隔,其他的字母均使用小写,单词的首个字母使用小写.例：$orderList</li>
+<li>数组变量命名,采用驼峰式写法,以大写字母作为单词的分隔,其他的字母均使用小写,单词的首个字母使用小写.例：$userArray</li>
+<li>全局变量命名,带前缀 ‘g’,采用驼峰式写法,使用大写字母作为词的分隔,其他的字母均使用小写,标明一个变量的作用域.例：global $gLog;</li>
+<li>全局常量命名,所有字母都使用大写,以下划线 ‘_’ 分隔每个单词.例：define(‘WEB_NAME’, ‘博客’);</li>
+<li>静态变量命名,带前缀 ‘s’,采用驼峰式写法,使用大写字母作为词的分隔,其他的字母均使用小写.例：function test() {static $sStatus = 0;}</li>
+<li>函数命名,使用小写字母、下划线组合.例：function get_client_ip () {}</li>
+<li>类文件命名,类的文件名与类的名字保持一致,包括大小写,以 “ .class.php”作为文件的后缀.例：User 类保存的文件名称是 User.class.php,UserAccount 类保存的文件名称是 UserAccount.class.php</li>
+<li>类的命名,采用驼峰式写法,以大写字母作为词的分隔,其他的字母均使用小写,名词的首个字母使用大写,不使用下划线.例：class User {}, class UserAccount {}</li>
+<li>类属性命名,以字符 ‘m’ 为前缀,采用驼峰式写法,以大写字母作为词的分隔,其他的字母均使用小写.例：public $mUserName;  (习惯了 public $userName; 通常下划线开头的属性为私有属性 private $_userName;)</li>
+<li>类方法命名,采用驼峰法,即以大写字母作为词的分隔,其他的字母均使用小写.例：public function checkEmail () {}  (通常下划线开头的方法为私有方法 private function _checkEmail () {})</li>
+<li>类方法参数命名,采用驼峰式写法,以大写字母作为单词的分隔,其他的字母均使用小写,单词的首个字母使用小写.例：public function checkPwd ($oldPwd, $newPwd) {}</li>
+<li>类的实例对象的命名(对象变量命名),以下划线开头,采用驼峰式写法,以大写字母作为单词的分隔,其他的字母均使用小写,单词的首个字母使用小写.例：$_user = new User();  $_userAccount = new UserAccount();  也可以使用 $user_obj = new User();  $user_account_obj = new UserAccount();</li>
+<li>引用变量,以字符 ‘r’ 为前缀.例：function get_tree (&amp;$rData) {}</li>
+<li>所有命名可以组合使用.例：class User { public static $msUserName;} 既是类属性又是静态变量</li>
+<li>模板文件名命名,所有字母都使用小写,使用 ‘_’ 作为每个词的分界.例：user_list.html  </li>
+<li>文件名的命名,所有字母都使用小写,使用 ‘_’ 作为每个词的分界.例：user_list.php</li>
+<li>数据库命名,表名所有字母都使用小写,使用 ‘_’ 作为每个词的分界,数据字段命名也与数据表命名相同.例： ms_user,ms_user_info</li>
+</ol>
+<!-- more -->
+<div class="note danger"><p>代码样式风格</p></div>
+<ol>
+<li><p>命名空间(Namespace) 和 导入(Use)声明</p>
+<blockquote><ol>
+<li>命名空间(namespace)的声明后面必须有一行空行</li>
+<li>所有的导入(use)声明必须放在命名空间(namespace)声明的下面</li>
+<li>一句声明中,必须只有一个导入(use)关键字</li>
+<li>在导入(use)声明代码块后面必须有一行空行</li>
+</ol>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Lib</span>\<span class="title">Databases</span>;                <span class="comment">// 下面必须空一行</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">use</span> <span class="title">FooInterface</span>;                       <span class="comment">// use 必须在namespace 后面声明</span></span><br><span class="line"><span class="keyword">use</span> <span class="title">BarClass</span> <span class="title">as</span> <span class="title">Bar</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">OtherVendor</span>\<span class="title">OtherPackage</span>\<span class="title">BazClass</span>;  <span class="comment">// 下面必须空一行</span></span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MySQL</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>类(class),属性(property)和方法(method)</p>
+<blockquote><ol>
+<li>继承(extends) 和实现(implement) 必须和 class name 写在一行</li>
+<li>属性(property),必须声明其可见性,到底是 public 还是 protected 还是 private,不能省略,也不能使用var,var是php老版本中的什么方式,等用于public</li>
+<li>方法(method),必须 声明其可见性,到底是 public 还是 protected 还是 private,不能省略;如果有多个参数,第一个参数后紧接 “,”,再加一个空格：function_name ($par, $par2, $pa3), 如果参数有默认值, “=” 左右各有一个空格分开</li>
+<li>当用到抽象(abstract)和终结(final)来做类声明时,它们必须放在可见性声明 (public 还是protected还是private) 的前面;当用到静态(static)来做类声明时,则必须放在可见性声明的后面</li>
+</ol>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Lib</span>\<span class="title">Databaes</span>;</span><br><span class="line">  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MySQL</span> <span class="keyword">extends</span> <span class="title">ParentClass</span> <span class="keyword">implements</span> \<span class="title">PDO</span>, \<span class="title">DB</span>    // 写一行</span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> $foo = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">private</span> $name = <span class="string">'yangyi'</span>;</span><br><span class="line">    <span class="keyword">protected</span> $age = <span class="string">'17'</span>;</span><br><span class="line">    <span class="keyword">public</span> getInfo($name, $age, $gender = <span class="number">1</span>)            <span class="comment">// 参数之间有一个空格,默认参数的"="左右各有一个空格</span></span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">ClassName</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> $foo;              <span class="comment">// static放后面</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">zim</span><span class="params">()</span></span>;  <span class="comment">// abstract放前面</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">bar</span><span class="params">()</span>  // <span class="title">final</span>放前面,<span class="title">static</span>放最后</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>控制结构</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">if</span> ($expr1) &#123;       <span class="comment">// if 与 ( 之间有一个空格, ) 与 &#123; 之间有一个空格</span></span><br><span class="line">     </span><br><span class="line">&#125; <span class="keyword">elseif</span> ($expr2) &#123; <span class="comment">// elesif 连着写,与 ( 之间有一个空格, ) 与 &#123; 之间有一个空格</span></span><br><span class="line">     </span><br><span class="line">&#125; <span class="keyword">else</span> &#123;            <span class="comment">// else 左右各一个空格</span></span><br><span class="line">     </span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">switch</span> ($expr) &#123;    <span class="comment">// switch 与 ( 之间有一个空格, ) 与 &#123; 之间有一个空格</span></span><br><span class="line">    <span class="keyword">case</span> <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">'First case, with a break'</span>; <span class="comment">// 对齐</span></span><br><span class="line">        <span class="keyword">break</span>;                           <span class="comment">// 换行写break,也对齐</span></span><br><span class="line">    <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">    <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">    <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">    <span class="keyword">case</span> <span class="number">4</span>:</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">'return instead of break'</span>;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">'Default case'</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">while</span> ($expr) &#123;     <span class="comment">// while 与 ( 之间有一个空格, ) 与 &#123; 之间有一个空格</span></span><br><span class="line">     </span><br><span class="line">&#125;</span><br><span class="line">  </span><br><span class="line"><span class="keyword">do</span> &#123;                <span class="comment">// do 与 &#123; 之间有一个空格</span></span><br><span class="line">     </span><br><span class="line">&#125; <span class="keyword">while</span> ($expr);    <span class="comment">// while 左右各有一个空格</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> ($i = <span class="number">0</span>; $i &lt; <span class="number">10</span>; $i++) &#123;           <span class="comment">// for 与 ( 之间有一个空格, 二元操作符 "="、"&lt;" 左右各有一个空格, ) 与 &#123; 之间有一个空格</span></span><br><span class="line"> </span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">foreach</span> ($iterable <span class="keyword">as</span> $key =&gt; $value) &#123; <span class="comment">// foreach 与 ( 之间有一个空格, "=&gt;" 左右各有一个空格, ) 与 &#123; 之间有一个空格</span></span><br><span class="line"> </span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">try</span> &#123;                               <span class="comment">// try 右边有一个空格</span></span><br><span class="line"> </span><br><span class="line">&#125; <span class="keyword">catch</span> (FirstExceptionType $e) &#123;   <span class="comment">// catch 与 ( 之间有一个空格, ) 与 &#123; 之间有一个空格</span></span><br><span class="line"> </span><br><span class="line">&#125; <span class="keyword">catch</span> (OtherExceptionType $e) &#123;   <span class="comment">// catch 与 ( 之间有一个空格, ) 与 &#123; 之间有一个空格</span></span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注释</p>
+<blockquote><ol>
+<li>行注释  // 后面需要加一个空格,如果 // 前面有非空字符,则 // 前面需要加一个空格</li>
+<li>函数注释,参数名、属性名、标签的文本 上下要对齐,在第一个标签前加一个空行</li>
+</ol>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * This is a sample function to illustrate additional PHP</span></span><br><span class="line"><span class="comment"> * formatter options.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span>        $one   The first parameter</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> int    $two   The second parameter</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> string $three The third parameter with a longer</span></span><br><span class="line"><span class="comment"> *                      comment to illustrate wrapping.</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> void</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span>  phpgo.cnblogs.com</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@license</span> GPL</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span><span class="params">($one, $two = <span class="number">0</span>, $three = <span class="string">"String"</span>)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>空格</p>
+<blockquote><ol>
+<li>赋值操作符(=,+= 等)、逻辑操作符(&amp;&amp;,||)、等号操作符(==,!=)、关系运算符(&lt;,&gt;,&lt;=,&gt;=)、按位操作符(&amp;,|,^)、连接符(.) 左右各有一个空格</li>
+<li>if,else,elseif,while,do,switch,for,foreach,try,catch,finally 等 与 紧挨的左括号”(“之间有一个空格</li>
+<li>函数、方法的各个参数之间,逗号(“,”)后面有一个空格</li>
+</ol>
+</blockquote></li>
+<li><p>空行</p>
+<blockquote><ol>
+<li>所有左花括号 { 都不换行,并且 { 紧挨着的下方,一定不是空行</li>
+<li>同级代码(缩进相同)的 注释(行注释/块注释)前面,必须有一个空行</li>
+<li>各个方法/函数 之间有一个空行</li>
+<li>namespace语句、use语句、clase语句 之间有一个空行</li>
+<li>return语句,如果 return 语句之前只有一行PHP代码,return 语句之前不需要空行; 如果 return 语句之前有至少二行PHP代码,return 语句之前加一个空行</li>
+<li>if,while,switch,for,foreach,try 等代码块之间 以及 与其他代码之间有一个空行</li>
+</ol>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 获得用户统计信息</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> int $userId 用户ID</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> array</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getUserCard</span><span class="params">($userId)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $userId = intval($userId);</span><br><span class="line">    <span class="keyword">return</span> UserMainLogic::instance()-&gt;getUserCard($userId);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 根据Id 获取用户信息</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> int    $userId 用户Id</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> string $field  显示字段</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> array</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getByUserId</span><span class="params">($userId = <span class="number">0</span>, $field = <span class="string">'*'</span>)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">empty</span>($userId)) &#123;</span><br><span class="line">        <span class="keyword">return</span> [];</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    $where = [<span class="string">'id'</span> =&gt; $userId];</span><br><span class="line">    $info = <span class="keyword">$this</span>-&gt;field($field)-&gt;where($where)-&gt;find();</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">isset</span>($info[<span class="string">'image'</span>]) &amp;&amp; <span class="keyword">isset</span>($info[<span class="string">'sex'</span>])) &#123;</span><br><span class="line">        $info[<span class="string">'image'</span>] = ImageHelper::GetImageUrl($info[<span class="string">'image'</span>], $info[<span class="string">'sex'</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> $info;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">$serv = <span class="keyword">new</span> swoole_server(<span class="string">"127.0.0.1"</span>, <span class="number">9502</span>);</span><br><span class="line">  </span><br><span class="line"><span class="comment">// sets server configuration, we set task_worker_num config greater than 0 to enable task workers support</span></span><br><span class="line">$serv-&gt;set([<span class="string">'task_worker_num'</span> =&gt; <span class="number">4</span>]);</span><br><span class="line">  </span><br><span class="line"><span class="comment">// attach handler for receive event, which have explained above.</span></span><br><span class="line">$serv-&gt;on(<span class="string">'receive'</span>, <span class="function"><span class="keyword">function</span><span class="params">($serv, $fd, $from_id, $data)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// we dispath a task to task workers by invoke the task() method of $serv</span></span><br><span class="line">    <span class="comment">// this method returns a task id as the identity of ths task</span></span><br><span class="line">    $task_id = $serv-&gt;task($data);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"Dispath AsyncTask: id=$task_id\n"</span>;</span><br><span class="line">&#125;);</span><br><span class="line">  </span><br><span class="line"><span class="comment">// attach handler for task event, the handler will be executed in task workers.</span></span><br><span class="line">$serv-&gt;on(<span class="string">'task'</span>, <span class="function"><span class="keyword">function</span> <span class="params">($serv, $task_id, $from_id, $data)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// handle the task, do what you want with $data</span></span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"New AsyncTask[id=$task_id]"</span>.PHP_EOL;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// after the task task is handled, we return the results to caller worker.</span></span><br><span class="line">    $serv-&gt;finish(<span class="string">"$data -&gt; OK"</span>);</span><br><span class="line">&#125;);</span><br><span class="line">  </span><br><span class="line"><span class="comment">// attach handler for finish event, the handler will be executed in server workers, the same worker dispatched this task before.</span></span><br><span class="line">$serv-&gt;on(<span class="string">'finish'</span>, <span class="function"><span class="keyword">function</span> <span class="params">($serv, $task_id, $data)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"AsyncTask[$task_id] Finish: $data"</span>.PHP_EOL;</span><br><span class="line">&#125;);</span><br><span class="line">  </span><br><span class="line">$serv-&gt;start();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>数组的书写格式</p>
+<ul>
+<li><p>只有一个键值对时,就写成一行：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$where = [<span class="string">'id'</span> =&gt; <span class="number">789</span>];</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>有多个(二个或二个以上)键值对时,就换行：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$where = [</span><br><span class="line">    <span class="string">'id'</span> =&gt; <span class="number">789</span>,</span><br><span class="line">    <span class="string">'user_name'</span> =&gt; <span class="string">'phpgo'</span></span><br><span class="line">];</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>Mr</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://sevming.github.io/PHP/coding-standards.html" title="PHP 代码规范">http://sevming.github.io/PHP/coding-standards.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/php/" rel="tag"># php</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/Linux/vmware-centos7-network-configuration.html" rel="next" title="Vmware 搭建 Centos7 后的网络配置">
+                <i class="fa fa-chevron-left"></i> Vmware 搭建 Centos7 后的网络配置
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/PHP/generate-xml.html" rel="prev" title="生成XML的四种方式">
+                生成XML的四种方式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.png"
+                alt="Mr" />
+            
+              <p class="site-author-name" itemprop="name">Mr</p>
+              <p class="site-description motion-element" itemprop="description">懒........</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">102</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://novnan.github.io" title="Novnan" target="_blank">Novnan</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://zhengyongshun.com" title="挨踢Blog" target="_blank">挨踢Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://25550808.github.io" title="Eagle" target="_blank">Eagle</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://luscio.github.io" title="Timber" target="_blank">Timber</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://952425340.github.io" title="谢炳南" target="_blank">谢炳南</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mr</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.2"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#more");
+  
+  </script>
+
+
+</body>
+</html>

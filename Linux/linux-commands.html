@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.0.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.0.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="linux," />
+
+
+<meta name="description" content="chmod 12345678#修改web目录下所有文件夹与文件的权限chmod -R 755 web#修改web目录下的所有目录权限find web -type d -exec chmod 755 &amp;#123;&amp;#125; \;#修改web目录下的所有文件权限find web -type f -exec chmod 644 &amp;#123;&amp;#125; \;#批量清空web目录下所有文件内容for i">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux 常用命令">
+<meta property="og:url" content="http://sevming.github.io/Linux/linux-commands.html">
+<meta property="og:site_name" content="Mr.Blog">
+<meta property="og:description" content="chmod 12345678#修改web目录下所有文件夹与文件的权限chmod -R 755 web#修改web目录下的所有目录权限find web -type d -exec chmod 755 &amp;#123;&amp;#125; \;#修改web目录下的所有文件权限find web -type f -exec chmod 644 &amp;#123;&amp;#125; \;#批量清空web目录下所有文件内容for i">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-07-15T04:00:35.442Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux 常用命令">
+<meta name="twitter:description" content="chmod 12345678#修改web目录下所有文件夹与文件的权限chmod -R 755 web#修改web目录下的所有目录权限find web -type d -exec chmod 755 &amp;#123;&amp;#125; \;#修改web目录下的所有文件权限find web -type f -exec chmod 644 &amp;#123;&amp;#125; \;#批量清空web目录下所有文件内容for i">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Mr.Blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="http://sevming.github.io/Linux/linux-commands.html"/>
+
+
+  <title>Linux 常用命令 | Mr.Blog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr.Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+  
+  
+  
+    <a href="https://github.com/sevming" class="github-corner" target="_blank" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sevming.github.io/Linux/linux-commands.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Mr">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr.Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux 常用命令</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-27T10:39:30+00:00">2018-01-27</time>
+            
+
+            
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                    <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于&#58;</span>
+                <time title="更新于" itemprop="dateModified" datetime="2021-07-12T16:23:00+00:00">2021-07-12</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <div class="note danger"><p>chmod</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#修改web目录下所有文件夹与文件的权限</span></span><br><span class="line">chmod -R 755 web</span><br><span class="line"><span class="comment">#修改web目录下的所有目录权限</span></span><br><span class="line">find web -<span class="built_in">type</span> d -<span class="built_in">exec</span> chmod 755 &#123;&#125; \;</span><br><span class="line"><span class="comment">#修改web目录下的所有文件权限</span></span><br><span class="line">find web -<span class="built_in">type</span> f -<span class="built_in">exec</span> chmod 644 &#123;&#125; \;</span><br><span class="line"><span class="comment">#批量清空web目录下所有文件内容</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> `find web -<span class="built_in">type</span> f`;<span class="keyword">do</span> cat /dev/null &gt; <span class="variable">$i</span>;<span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>chown</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#修改文件或目录的所属组和所有者</span></span><br><span class="line">chown -R 组:用户 路径</span><br><span class="line"><span class="comment">#修改web目录及子文件所属组和所有者</span></span><br><span class="line">chown -R www:www web</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<div class="note danger"><p>端口/进程</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#杀死所有进程名包含WorkerMan的进程</span></span><br><span class="line">ps aux|grep WorkerMan|grep -v grep|awk <span class="string">'&#123;print $2&#125;'</span>|xargs <span class="built_in">kill</span> -9;</span><br><span class="line"><span class="comment"># 管道符 "|" 用来隔开两个命令, 管道符左边命令的输出会作为管道符右边命令的输入</span></span><br><span class="line"><span class="comment"># "ps -ef" 是linux里查看所有进程的命令, 这时检索出的进程将作为下一条命令"grep WorkerMan"的输入</span></span><br><span class="line"><span class="comment"># "grep workerman" 的输出结果是所有含有关键字"WorkerMan"的进程</span></span><br><span class="line"><span class="comment"># "grep -v grep" 是在列出的进程中去除含有关键字"grep"的进程</span></span><br><span class="line"><span class="comment"># "xargs kill -9" 中的 xargs 命令是用来把前面命令的输出结果(PID)作为"kill -9"命令的参数, 并执行该命令, "kill -9"会强行杀掉指定进程</span></span><br><span class="line"><span class="comment"># "ps x" 是linux里显示所有进程的命令, 不以终端机来区分</span></span><br><span class="line"><span class="comment"># "awk '&#123;print $1&#125;'"  会匹配输出结果的第一个字段, $2 表示输出第二个字段；若是 awk '&#123;print $1, $2&#125;' 会匹配输出结果的第一个和第二个字段</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#查看指定端口被哪个程序占用了</span></span><br><span class="line">netstat -anp|grep 8383</span><br><span class="line">lsof -i:8383</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看所有的端口占用情况</span></span><br><span class="line">netstat -ano</span><br><span class="line"></span><br><span class="line"><span class="comment">#Windows查看指定端口的占用情况</span></span><br><span class="line">netstat -aon|findstr <span class="string">"9050"</span></span><br><span class="line">协议    本地地址              外部地址               状态            PID</span><br><span class="line">TCP    127.0.0.1:9050         0.0.0.0:0              LISTENING       2016</span><br><span class="line"></span><br><span class="line"><span class="comment">#Windows 查看PID对应的进程</span></span><br><span class="line">tasklist|findstr <span class="string">"2016"</span> </span><br><span class="line"> </span><br><span class="line"><span class="comment">#Windows 结束进程</span></span><br><span class="line">taskkill /f /t /im tor.exe</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>tar/zip</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#tar打包</span></span><br><span class="line">tar -cvf web.tar web/</span><br><span class="line"><span class="comment">#tar解压</span></span><br><span class="line">tar -xvf web.tar</span><br><span class="line"></span><br><span class="line"><span class="comment">#zip打包</span></span><br><span class="line">zip -r web.zip web/</span><br><span class="line"><span class="comment">#zip解压并覆盖</span></span><br><span class="line">unzip -o web.zip</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>文件</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#新增文件</span></span><br><span class="line">touch test.txt</span><br><span class="line"><span class="comment">#清空文件</span></span><br><span class="line">&gt; test.txt</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看当前目录下的文件数量</span></span><br><span class="line">ls | wc -l</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>df/du</p></div>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看磁盘的使用情况以及文件系统被挂载的位置</span></span><br><span class="line">df -lh</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看目录所占空间</span></span><br><span class="line">du -sh [可选,目录名]</span><br><span class="line">	</span><br><span class="line"><span class="comment">#列出目录下所有文件大小</span></span><br><span class="line">du -sh *</span><br><span class="line"></span><br><span class="line"><span class="comment">#获得机器中所有的硬盘的分区情况</span></span><br><span class="line">fdisk -l</span><br><span class="line">	</span><br><span class="line"><span class="comment">#查看目录挂载点</span></span><br><span class="line">df [目录名] -kh</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>防火墙 Firewall</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看所有信息</span></span><br><span class="line">firewall-cmd --list-all</span><br><span class="line"><span class="comment">#添加开放端口(--permanent 表示永久生效)</span></span><br><span class="line">firewall-cmd --add-port=80/tcp --permanent</span><br><span class="line"><span class="comment">#删除开放端口</span></span><br><span class="line">firewall-cmd --remove-port=80/tcp --permanent</span><br><span class="line"><span class="comment">#重启服务</span></span><br><span class="line">systemctl restart firewalld</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>yum </p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#安装失败后, 删除 /etc/yum.repos.d 目录下对应的 repo, 然后运行 yum clean all</span></span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>ENV</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看PATH环境变量</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$PATH</span></span><br><span class="line"><span class="comment">#设置PATH</span></span><br><span class="line"><span class="built_in">export</span> PATH=路径1:路径2</span><br><span class="line"><span class="comment">#重新执行</span></span><br><span class="line"><span class="built_in">source</span> .bashrc</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>服务器时间同步以及修改为24小时制</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#安装ntpdate工具</span></span><br><span class="line">yum -y install ntp ntpdate</span><br><span class="line"><span class="comment">#设置系统时间与网络时间同步</span></span><br><span class="line">ntpdate cn.pool.ntp.org</span><br><span class="line"><span class="comment">#将系统时间写入硬件时间</span></span><br><span class="line">hwclock --systohc</span><br><span class="line"><span class="comment">#强制系统时间写入CMOS中防止重启失效</span></span><br><span class="line">hwclock -w</span><br><span class="line"></span><br><span class="line"><span class="comment">#修改为24小时制</span></span><br><span class="line">vi /etc/sysconfig/clock </span><br><span class="line">ZONE=<span class="string">"Asian/Shanghai"</span></span><br><span class="line">UTC=<span class="literal">false</span></span><br><span class="line"></span><br><span class="line">cp /etc/localtime /usr/share/zoneinfo/Asia/Shanghai</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>通过进程名来杀死指定进程</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pkill -f <span class="string">"进程名"</span></span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>创建软链接</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ln -s 源文件或目录 目标文件或目录</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>防火墙 Iptables</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#添加iptables 3306 端口</span></span><br><span class="line">iptables -I INPUT 4 -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT</span><br><span class="line"><span class="comment">#永久保存iptables规则</span></span><br><span class="line">service iptables save </span><br><span class="line"></span><br><span class="line"><span class="comment">#添加iptables 3306 端口</span></span><br><span class="line">vi /etc/sysconfig/iptables</span><br><span class="line">-A INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT</span><br><span class="line"><span class="comment">#保存退出并重启</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#查看添加的iptables规则</span></span><br><span class="line">iptables -nvL</span><br><span class="line"><span class="comment">#查看防火墙状态</span></span><br><span class="line">service iptables status</span><br><span class="line"><span class="comment">#停止防火墙</span></span><br><span class="line">service iptables stop</span><br><span class="line"><span class="comment">#启动防火墙</span></span><br><span class="line">service iptables start</span><br><span class="line"><span class="comment">#重启防火墙</span></span><br><span class="line">service iptables restart</span><br><span class="line"><span class="comment">#永久关闭防火墙</span></span><br><span class="line">chkconfig iptables off</span><br><span class="line"><span class="comment">#永久关闭后重启</span></span><br><span class="line">chkconfig iptables on</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>scp - Linux 之间复制文件和目录</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 参数说明 </span></span><br><span class="line">-r 递归复制整个目录</span><br><span class="line">-P 指定端口号(大写的 P)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 本地复制至远程</span></span><br><span class="line">scp local_file remote_username@remote_ip:remote_folder </span><br><span class="line"><span class="comment"># 远程复制到本地</span></span><br><span class="line">scp remote_username@remote_ip:remote_folder local_file</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>删除过期文件</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm -rf /data/`date -d <span class="string">"3 days ago"</span> +%Y%m%d`.txt</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>Centos7 开机启动自定义脚本</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1. 赋予脚本可执行权限</span></span><br><span class="line">chmod +x /test.sh</span><br><span class="line"><span class="comment">#2. 打开 /etc/rc.d/rc.local, 在末尾添加以下内容</span></span><br><span class="line">/bin/sh /test.sh</span><br><span class="line"><span class="comment">#3. 在 centos7 中, /etc/rc.d/rc.local 权限被降低了, 需要赋予执行权限</span></span><br><span class="line">chmod +x /etc/rc.d/rc.local</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>systemctl </p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看启动项 enabled是开机启动, disabled是开机不启动</span></span><br><span class="line">systemctl list-unit-files </span><br><span class="line"><span class="comment"># 查看开机启动项</span></span><br><span class="line">systemctl list-unit-files | grep <span class="built_in">enable</span></span><br><span class="line"><span class="comment"># 查看某服务</span></span><br><span class="line">systemctl list-unit-files | grep postfix</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>指定用户运行命令</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">su - 用户名 -c <span class="string">"命令"</span></span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>SSH 免密公钥登录</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 服务器 IP：121.21.211.211，端口：7777，用户名：www</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成 RSA 公钥私钥文件（这里存储路径 /Users/sev/.ssh)</span></span><br><span class="line">ssh-keygen -t rsa</span><br><span class="line"><span class="comment"># 将公钥追加到远程服务器的 authorized_keys 文件</span></span><br><span class="line">ssh-copy-id -i /Users/sev/.ssh/id_rsa.pub -p 7777 www@121.21.211.211</span><br><span class="line"><span class="comment"># 尝试登录</span></span><br><span class="line">ssh -p 7777 www@121.21.211.211</span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>rsync 远程数据同步</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 参数说明</span></span><br><span class="line">-v, --verbose 详细模式输出</span><br><span class="line">-a, --archive 归档(压缩)模式,表示以递归方式传输文件,并保持所有文件属性等同于 -rlptgoD (无 -H,-A,-X)</span><br><span class="line">-r, --recursive 对子目录以递归模式处理</span><br><span class="line">-e, --rsh=COMMAND 指定使用rsh,ssh方式进行数据同步</span><br><span class="line">-z, --compress 在传输过程中进行压缩</span><br><span class="line">-i, --itemize-changes 输出对所有更新的变更摘要</span><br><span class="line">-h, --human-readable 用人类可读的格式输出数字</span><br><span class="line"></span><br><span class="line">--delete 删除那些 DST 中 SRC 没有的文件（镜像同步）</span><br><span class="line">--exclude=PATTERN 排除符合匹配规则的文件</span><br><span class="line"></span><br><span class="line">-l, --links 不处理符号链接(保留符号链接)</span><br><span class="line">-L, --copy-links 将符号链接处理为具体的文件或者文件夹</span><br><span class="line">-p, --perms 保留权限</span><br><span class="line">-o, --owner 保留所有者(仅限superuser)</span><br><span class="line">-g, --group 保留组</span><br><span class="line">-t, --<span class="built_in">times</span> 保留修改时间</span><br><span class="line">--devices 保留设备文件(仅限superuser)</span><br><span class="line">--specials 保留特殊文件</span><br><span class="line">-D 和--devices --specials一样</span><br><span class="line"></span><br><span class="line"><span class="comment"># Example - 同步本地本件（/Users/sev/test/ 目录下的文件）至远程服务器的 /home/www/test 目录下</span></span><br><span class="line">rsync -azv -e <span class="string">"ssh -p 7777"</span> --delete \</span><br><span class="line">	--exclude=.git \</span><br><span class="line">	--exclude=.idea \</span><br><span class="line">	--exclude=vendor \</span><br><span class="line">	--exclude=.gitignore \</span><br><span class="line">	--exclude=.gitlab-ci.yml \</span><br><span class="line">	--exclude=.DS_Store \</span><br><span class="line">	/Users/sev/<span class="built_in">test</span>/ www@121.21.211.211:/home/www/<span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>expect 自动化交互套件，主要应用于执行命令和程序时，系统以交互形式要求输入指定字符串，实现交互通信。</p></div>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 常用选项</span></span><br><span class="line">-c  执行脚本前先执行的命令，可多次使用。</span><br><span class="line">-d  debug模式，可以在运行时输出一些诊断信息，与在脚本开始处使用exp_internal 1相似。</span><br><span class="line">-D  启用交换调式器,可设一整数参数。</span><br><span class="line">-f  从文件读取命令，仅用于使用<span class="comment">#!时。如果文件名为"-"，则从stdin读取(使用"./-"从文件名为-的文件读取)。</span></span><br><span class="line">-i  交互式输入命令，使用<span class="string">"exit"</span>或<span class="string">"EOF"</span>退出输入状态。</span><br><span class="line">--  标示选项结束(如果你需要传递与expect选项相似的参数给脚本时)，可放到<span class="comment">#!行:#!/usr/bin/expect --。</span></span><br><span class="line">-v  显示expect版本信息</span><br><span class="line"></span><br><span class="line"><span class="comment"># 内部命令</span></span><br><span class="line">spawn               交互程序开始后面跟命令或者指定程序</span><br><span class="line">expect              获取匹配信息匹配成功则执行expect后面的程序动作</span><br><span class="line">send exp_send       用于发送指定的字符串信息</span><br><span class="line">exp_continue        在expect中多次匹配就需要用到</span><br><span class="line">send_user           用来打印输出 相当于shell中的<span class="built_in">echo</span></span><br><span class="line"><span class="built_in">exit</span>                退出expect脚本</span><br><span class="line">eof                 expect执行结束 退出</span><br><span class="line"><span class="built_in">set</span>                 定义变量</span><br><span class="line">puts                输出变量</span><br><span class="line"><span class="built_in">set</span> timeout         设置超时时间</span><br><span class="line">interact            交互模式</span><br></pre></td></tr></table></figure>
+<blockquote><p>SSH 登录</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/expect -f</span></span><br><span class="line"><span class="comment"># 脚本名称：login.exp；运行命令：expect login.exp</span></span><br><span class="line">spawn ssh root@192.168.0.77</span><br><span class="line">expect &#123;</span><br><span class="line">  <span class="string">"*yes/no"</span> &#123;</span><br><span class="line">    send <span class="string">"yes\r"</span></span><br><span class="line">    exp_continue</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="string">"*assword:"</span> &#123;</span><br><span class="line">    send <span class="string">"123456\r"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">expect <span class="string">"]#"</span> &#123;</span><br><span class="line">    send <span class="string">"pwd\r"</span></span><br><span class="line">&#125;</span><br><span class="line">expect <span class="string">"]#"</span> &#123;</span><br><span class="line">    send <span class="string">"exit\r"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">expect eof</span><br></pre></td></tr></table></figure>
+<blockquote><p>shell 内嵌 except 脚本</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Hello"</span></span><br><span class="line"></span><br><span class="line">/usr/bin/expect &lt;&lt;-EOF</span><br><span class="line">  spawn ssh root@192.168.0.77</span><br><span class="line">  expect &#123;</span><br><span class="line">    <span class="string">"*yes/no"</span> &#123;</span><br><span class="line">      send <span class="string">"yes\r"</span></span><br><span class="line">      exp_continue</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="string">"*assword:"</span> &#123;</span><br><span class="line">      end <span class="string">"123456\r"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  expect <span class="string">"]#"</span> &#123;</span><br><span class="line">    send <span class="string">"pwd\r"</span></span><br><span class="line">  &#125;</span><br><span class="line">  expect <span class="string">"]#"</span> &#123;</span><br><span class="line">    send <span class="string">"exit\r"</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  expect eof</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"World"</span></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>Mr</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://sevming.github.io/Linux/linux-commands.html" title="Linux 常用命令">http://sevming.github.io/Linux/linux-commands.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/linux/" rel="tag"># linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/Hexo/hexo-github-gitee-build-blog.html" rel="next" title="Hexo + Github + 码云 搭建博客">
+                <i class="fa fa-chevron-left"></i> Hexo + Github + 码云 搭建博客
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/PHP/win64-build-wamp.html" rel="prev" title="Windows64位 WAMP环境搭建">
+                Windows64位 WAMP环境搭建 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/uploads/avatar.png"
+                alt="Mr" />
+            
+              <p class="site-author-name" itemprop="name">Mr</p>
+              <p class="site-description motion-element" itemprop="description">懒........</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">102</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://novnan.github.io" title="Novnan" target="_blank">Novnan</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://zhengyongshun.com" title="挨踢Blog" target="_blank">挨踢Blog</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://25550808.github.io" title="Eagle" target="_blank">Eagle</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://luscio.github.io" title="Timber" target="_blank">Timber</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://952425340.github.io" title="谢炳南" target="_blank">谢炳南</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2020 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mr</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.0.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.2"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#more");
+  
+  </script>
+
+
+</body>
+</html>
